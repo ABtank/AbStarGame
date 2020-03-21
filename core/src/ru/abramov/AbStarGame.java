@@ -9,14 +9,19 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 public class AbStarGame extends ApplicationAdapter {
 	SpriteBatch batch;//выгрузка текстур
-	Texture img;
-	TextureRegion region;
+//	Texture img;
+    Background background;
+//	TextureRegion region;
+	Hero hero;
+
 	
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
-		region = new TextureRegion(img,10,10,150,150);
+//		img = new Texture("badlogic.jpg");
+		hero= new Hero();
+        background = new Background();
+//		region = new TextureRegion(img,10,10,150,150);
 	}
 
 	@Override
@@ -24,16 +29,18 @@ public class AbStarGame extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0.5f, 0.7f, 0.8f, 0.5f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		batch.begin();  //передача текстур
-		batch.setColor(0.3f,0.8f,0.5f,0.5f);
-		batch.draw(img, 0, 0); // пора отрисовывать текстуру img
-		batch.setColor(0.9f,0.3f,0.7f,1f);
-		batch.draw(region,200,200);
+        background.render(batch);
+        hero.render(batch);
+//		batch.setColor(0.3f,0.8f,0.5f,0.5f);
+//		batch.draw(img, 0, 0); // пора отрисовывать текстуру img
+//		batch.setColor(0.9f,0.3f,0.7f,1f);
+//		batch.draw(region,200,200);
 		batch.end(); // выгрузка окончена
 	}
 	
 	@Override
 	public void dispose () {
 		batch.dispose();
-		img.dispose();
+//		img.dispose();
 	}
 }
