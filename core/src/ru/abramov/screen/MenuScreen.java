@@ -11,8 +11,10 @@ public class MenuScreen extends BaseScreen {
 
 
     private Vector2 pos;
+    private Vector2 point;
     private Texture img;
     private Background background;
+    private float speed=5f;
 
     @Override
     public void show() {
@@ -20,6 +22,7 @@ public class MenuScreen extends BaseScreen {
         img = new Texture("menuScreen.png");
         background = new Background();
         pos = new Vector2();
+        point = new Vector2();
     }
 
     @Override
@@ -30,10 +33,23 @@ public class MenuScreen extends BaseScreen {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        point.set(screenX, Gdx.graphics.getHeight() - screenY);
         return false;
     }
 
     private void update(float deltatime) {
+        if (point.x < pos.x) {
+            pos.x -= speed;
+        }
+        if (point.x > pos.x) {
+            pos.x += speed;
+        }
+        if (point.y > pos.y) {
+            pos.y += speed;
+        }
+        if (point.y < pos.y) {
+            pos.y -= speed;
+        }
     }
 
     private void draw() {
