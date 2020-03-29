@@ -14,31 +14,34 @@ public class Sprite extends Rect {
     protected int frame; //указатель на текущую текстуру
 
     public Sprite(TextureRegion region) throws GameExaption {
-        if(region==null){
+        if (region == null) {
             throw new GameExaption("Region is null");
         }
         regions = new TextureRegion[1];
-        regions[0] =region;
+        regions[0] = region;
     }
 
-    public void setHeightProportion(float height){
+    public void setHeightProportion(float height) {
         setHeight(height);
-        float aspect = regions[frame].getRegionWidth()/(float)regions[frame].getRegionHeight();
-        setWidth(height*aspect);
+        float aspect = regions[frame].getRegionWidth() / (float) regions[frame].getRegionHeight();
+        setWidth(height * aspect);
     }
 
-    public void drow(SpriteBatch batch){
+    public void draw(SpriteBatch batch) {
         batch.draw(
                 regions[frame],
-                getLeft(),getBottom(),
-                halfWidth,halfHeight,
-                getWidth(),getHeight(),
-                scale,scale,
-                angle
+                getLeft(), getBottom(), // точка отрисовки
+                halfWidth, halfHeight,  // точка вращения
+                getWidth(), getHeight(),// размеры
+                scale, scale,           // скалирование
+                angle                   // угол поворота
         );
     }
 
     public void resize(Rect worldBounds) {
+    }
+
+    public void update(float deltatime) {
     }
 
     public boolean touchDown(Vector2 touch, int pointer, int button) {

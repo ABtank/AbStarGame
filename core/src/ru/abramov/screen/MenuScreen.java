@@ -9,27 +9,28 @@ import ru.abramov.exeption.GameExaption;
 import ru.abramov.math.Rect;
 import ru.abramov.sprites.Background;
 import ru.abramov.base.BaseScreen;
+import ru.abramov.sprites.Logo;
 
 public class MenuScreen extends BaseScreen {
 
 
-    private Vector2 pos;
-    private Texture img;
     private Texture bg;
+    private Texture lg;
     private Background background;
+    private Logo logo;
 
     @Override
     public void show() {
         super.show();
-        img = new Texture("menuScreen.png");
+        lg = new Texture("menuScreen.png");
         bg =new Texture("background.jpg");
         try {
             background = new Background(bg);
+            logo = new Logo(lg);
         } catch (GameExaption e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-        pos = new Vector2();
     }
 
     @Override
@@ -41,23 +42,25 @@ public class MenuScreen extends BaseScreen {
     @Override
     public void resize(Rect worldBounds) {
         background.resize(worldBounds);
+        logo.resize(worldBounds);
     }
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
-        pos.set(touch);
+        logo.touchDown(touch,pointer,button);
         return false;
     }
 
     private void update(float deltatime) {
+        logo.update(deltatime);
     }
 
     private void draw() {
         Gdx.gl.glClearColor(0.5f, 0.7f, 0.8f, 0.5f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        background.drow(batch);
-        batch.draw(img, pos.x, pos.y, 0.2f, 0.2f);
+        background.draw(batch);
+        logo.draw(batch);
         batch.end();
     }
 
@@ -65,7 +68,7 @@ public class MenuScreen extends BaseScreen {
     @Override
     public void dispose() {
         batch.dispose();
-        img.dispose();
+        lg.dispose();
         bg.dispose();
         super.dispose();
     }
