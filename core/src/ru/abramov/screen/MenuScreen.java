@@ -4,68 +4,72 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
-import ru.abramov.Background;
+
+import ru.abramov.exeption.GameExaption;
+import ru.abramov.math.Rect;
+import ru.abramov.sprites.Background;
 import ru.abramov.base.BaseScreen;
+import ru.abramov.sprites.Logo;
 
 public class MenuScreen extends BaseScreen {
 
 
-    private Vector2 pos;
-    private Vector2 point;
-    private Texture img;
+    private Texture bg;
+    private Texture lg;
     private Background background;
-    private float speed=5f;
+    private Logo logo;
 
     @Override
     public void show() {
         super.show();
-        img = new Texture("menuScreen.png");
-        background = new Background();
-        pos = new Vector2();
-        point = new Vector2();
+        lg = new Texture("menuScreen.png");
+        bg =new Texture("background.jpg");
+        try {
+            background = new Background(bg);
+            logo = new Logo(lg);
+        } catch (GameExaption e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void render(float delta) {
-        update(delta);
+    public void render(float deltatime) {
+        update(deltatime);
         draw();
     }
 
     @Override
-    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        point.set(screenX, Gdx.graphics.getHeight() - screenY);
+    public void resize(Rect worldBounds) {
+        background.resize(worldBounds);
+        logo.resize(worldBounds);
+    }
+
+    @Override
+    public boolean touchDown(Vector2 touch, int pointer, int button) {
+        logo.touchDown(touch,pointer,button);
         return false;
     }
 
     private void update(float deltatime) {
-        if (point.x < pos.x) {
-            pos.x -= speed;
-        }
-        if (point.x > pos.x) {
-            pos.x += speed;
-        }
-        if (point.y > pos.y) {
-            pos.y += speed;
-        }
-        if (point.y < pos.y) {
-            pos.y -= speed;
-        }
+        logo.update(deltatime);
     }
 
     private void draw() {
         Gdx.gl.glClearColor(0.5f, 0.7f, 0.8f, 0.5f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        spriteBatch.begin();
-        background.render(spriteBatch);
-        spriteBatch.draw(img, pos.x, pos.y);
-        spriteBatch.end();
+        batch.begin();
+        background.draw(batch);
+        logo.draw(batch);
+        batch.end();
     }
 
 
     @Override
     public void dispose() {
-        spriteBatch.dispose();
-        img.dispose();
+        batch.dispose();
+        lg.dispose();
+        bg.dispose();
         super.dispose();
     }
 }
