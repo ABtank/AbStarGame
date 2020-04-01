@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-import ru.abramov.exeption.GameExaption;
+import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 
 public class Sprite extends Rect {
@@ -13,9 +13,9 @@ public class Sprite extends Rect {
     protected TextureRegion[] regions; // массив текстур
     protected int frame; //указатель на текущую текстуру
 
-    public Sprite(TextureRegion region) throws GameExaption {
+    public Sprite(TextureRegion region) throws GameException {
         if (region == null) {
-            throw new GameExaption("Region is null");
+            throw new GameException("Region is null");
         }
         regions = new TextureRegion[1];
         regions[0] = region;

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.abramov.base.Sprite;
-import ru.abramov.exeption.GameExaption;
+import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 
 public class Logo extends Sprite {
@@ -15,7 +15,7 @@ public class Logo extends Sprite {
     private Vector2 tmp;
     private Vector2 targetPoint;
 
-    public Logo(Texture texture) throws GameExaption {
+    public Logo(Texture texture) throws GameException {
         super(new TextureRegion(texture));
         v = new Vector2();
         targetPoint = new Vector2();
@@ -32,7 +32,7 @@ public class Logo extends Sprite {
     public void update(float deltatime) {
         super.update(deltatime);
         tmp.set(targetPoint);
-        if(tmp.sub(pos).len()>V_LEN){
+        if (tmp.sub(pos).len() > V_LEN) {
             pos.add(v);
         } else {
             pos.set(targetPoint);
@@ -46,13 +46,4 @@ public class Logo extends Sprite {
         return false;
     }
 
-    @Override
-    public boolean touchUp(Vector2 touch, int pointer, int button) {
-        return super.touchUp(touch, pointer, button);
-    }
-
-    @Override
-    public boolean touchDragged(Vector2 touch, int pointer) {
-        return super.touchDragged(touch, pointer);
-    }
 }
