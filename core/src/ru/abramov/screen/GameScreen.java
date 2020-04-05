@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Vector2;
 import ru.abramov.base.BaseScreen;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
+import ru.abramov.pool.BulletPool;
 import ru.abramov.sprites.Background;
 import ru.abramov.sprites.Hero;
 import ru.abramov.sprites.Star;
@@ -26,14 +27,14 @@ public class GameScreen extends BaseScreen {
 
     private TextureAtlas atlas;
     private Star[] stars;
+    private BulletPool bulletPool;
 
     @Override
     public void show() {
         super.show();
         bg = new Texture("background.jpg");
         atlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
-        shipsAtlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
-//        heroAtlas = new TextureAtlas(Gdx.files.internal("hero.pack"));
+        bulletPool= new BulletPool();
         initSprites();
     }
 
@@ -41,6 +42,7 @@ public class GameScreen extends BaseScreen {
     public void render(float deltatime) {
         super.render(deltatime);
         update(deltatime);
+        freeAllDestroyed();
         draw();
     }
 
@@ -57,13 +59,13 @@ public class GameScreen extends BaseScreen {
     @Override
     public boolean keyDown(int keycode) {
         hero.keyDown(keycode);
-        return super.keyDown(keycode);
+        return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
         hero.keyUp(keycode);
-        return super.keyUp(keycode);
+        return false;
     }
 
     @Override
@@ -78,12 +80,6 @@ public class GameScreen extends BaseScreen {
         return super.touchUp(touch, pointer, button);
     }
 
-    @Override
-    public boolean touchDragged(Vector2 touch, int pointer) {
-        hero.touchDragged(touch, pointer);
-        return super.touchDragged(touch, pointer);
-    }
-
     private void initSprites() {
         try {
             background = new Background(bg);
@@ -91,8 +87,7 @@ public class GameScreen extends BaseScreen {
             for (int i = 0; i < STAR_COUNT; i++) {
                 stars[i] =  new Star(atlas);
             }
-            hero = new Hero(shipsAtlas);
-//            hero = new Hero(heroAtlas);
+            hero = new Hero(atlas,bulletPool);
         } catch (GameException e) {
             throw new RuntimeException(e);
         }
@@ -103,6 +98,11 @@ public class GameScreen extends BaseScreen {
             star.update(deltatime);
         }
         hero.update(deltatime);
+        bulletPool.updateActiveSprites(deltatime);
+    }
+
+    public void freeAllDestroyed() {
+        bulletPool.freeAllDestroyedActiveObjects();
     }
 
     private void draw(){
@@ -114,14 +114,14 @@ public class GameScreen extends BaseScreen {
             star.draw(batch);
         }
         hero.draw(batch);
+        bulletPool.drawActiveSprites(batch);
         batch.end();
     }
     @Override
     public void dispose() {
         bg.dispose();
         atlas.dispose();
-        shipsAtlas.dispose();
-//        heroAtlas.dispose();
+        bulletPool.dispose();
         super.dispose();
     }
 }

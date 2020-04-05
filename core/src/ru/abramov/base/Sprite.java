@@ -6,12 +6,14 @@ import com.badlogic.gdx.math.Vector2;
 
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
+import ru.abramov.utils.Regions;
 
 public class Sprite extends Rect {
     protected float angle; //
     protected float scale = 1f; //
     protected TextureRegion[] regions; // массив текстур
     protected int frame; //указатель на текущую текстуру
+    private boolean destroyed = false;
 
     public Sprite(TextureRegion region) throws GameException {
         if (region == null) {
@@ -19,6 +21,16 @@ public class Sprite extends Rect {
         }
         regions = new TextureRegion[1];
         regions[0] = region;
+    }
+
+    public Sprite(TextureRegion region, int row, int cols, int frames) throws GameException {
+        if (region == null) {
+            throw new GameException("Region is null");
+        }
+        this.regions = Regions.split(region, row, cols, frames);
+    }
+
+    public Sprite() {
     }
 
     public void setHeightProportion(float height) {
@@ -70,5 +82,17 @@ public class Sprite extends Rect {
 
     public void setScale(float scale) {
         this.scale = scale;
+    }
+
+    public void destroy() {
+        destroyed = true;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    public void flushDestroy() {
+        destroyed = false;
     }
 }
