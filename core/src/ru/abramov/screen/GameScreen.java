@@ -18,8 +18,6 @@ public class GameScreen extends BaseScreen {
 
     private static final int STAR_COUNT = 64;
 
-    private TextureAtlas shipsAtlas;
-    private TextureAtlas heroAtlas;
     private Hero hero;
 
     private Texture bg;
@@ -122,6 +120,7 @@ public class GameScreen extends BaseScreen {
         bg.dispose();
         atlas.dispose();
         bulletPool.dispose();
+        music.dispose();
         super.dispose();
     }
 }

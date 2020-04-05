@@ -7,10 +7,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
+import ru.abramov.base.BaseScreen;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 import ru.abramov.sprites.Background;
-import ru.abramov.base.BaseScreen;
 import ru.abramov.sprites.ButtonExit;
 import ru.abramov.sprites.ButtonPlay;
 import ru.abramov.sprites.Logo;
@@ -35,7 +35,10 @@ public class MenuScreen extends BaseScreen {
     private ButtonPlay buttonPlay;
 
     public MenuScreen(Game game) {
+        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/song.mp3"));
         this.game = game;
+        music.play();
+        music.setLooping(true);
     }
 
     @Override

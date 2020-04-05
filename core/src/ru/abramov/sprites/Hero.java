@@ -1,5 +1,6 @@
 package ru.abramov.sprites;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -19,6 +20,8 @@ public class Hero extends Sprite {
     private BulletPool bulletPool;
     private TextureRegion bulletRegion;
     private Vector2 bulletV;
+    private float bulletInterval = 0.3f;
+    private float bulletTimer;
 
     private final Vector2 v0; //движение по оси х вправо
     private final Vector2 v;  //вектор фактической скорости
@@ -29,6 +32,7 @@ public class Hero extends Sprite {
     private int leftPointer = INVALID_POINTER;
     private int rightPointer = INVALID_POINTER;
 
+
     public Hero(TextureAtlas atlas, BulletPool bulletPool) throws GameException {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletPool = bulletPool;
@@ -36,6 +40,7 @@ public class Hero extends Sprite {
         bulletV = new Vector2(0, 0.5f);
         v0 = new Vector2(0.5f, 0);
         v = new Vector2();
+        sound = Gdx.audio.newSound(Gdx.files.internal("sounds/piu.mp3"));
     }
 
     @Override
@@ -56,6 +61,12 @@ public class Hero extends Sprite {
             setRight(worldBounds.getRight());
             stop();
         }
+        bulletTimer += delta;
+        if (bulletTimer >= bulletInterval) {
+            bulletTimer = 0;
+            shoot();
+        }
+
     }
 
     @Override
@@ -141,6 +152,7 @@ public class Hero extends Sprite {
     public void shoot() {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this, bulletRegion, pos, bulletV, 0.01f, worldBounds, 1);
+        sound.play(0.5f);
     }
 
     private void moveRight() {
