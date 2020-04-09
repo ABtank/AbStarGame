@@ -44,6 +44,7 @@ public class Enemy extends Sprite {
         }
         if (getTop() < worldBounds.getBottom()) {
             setBottom(worldBounds.getTop());
+            scale =5f;
         }
         if (getLeft() > worldBounds.getRight()) {
             setRight(worldBounds.getLeft());
