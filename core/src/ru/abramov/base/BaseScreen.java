@@ -3,6 +3,7 @@ package ru.abramov.base;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
@@ -23,6 +24,7 @@ public abstract class BaseScreen implements Screen, InputProcessor {
     private Matrix3 screenToWorld;
 
     private Vector2 touch;
+    protected Music music;
 
     @Override
     public void show() {
