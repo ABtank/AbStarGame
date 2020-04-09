@@ -1,55 +1,54 @@
 package ru.abramov.sprites;
 
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-import ru.abramov.base.Sprite;
-import ru.abramov.exception.GameException;
+import ru.abramov.base.Ship;
 import ru.abramov.math.Rect;
-import ru.abramov.math.Rnd;
+import ru.abramov.pool.BulletPool;
 
-public class Enemy extends Sprite {
-    private static final float HEIGHT = 0.01f;
-    private Vector2 v;
-    private Rect worldBounds;
-    private int enemyNumber;
-    private float animateInterval = 0.5f;
-    private float animateTimer;
+public class Enemy extends Ship {
 
-
-
-    public Enemy(TextureAtlas atlas) throws GameException {
-        super(atlas.findRegion("enemy1"));
-        float vx = Rnd.nextFloat(-0.01f, 0.01f);
-        float vy = Rnd.nextFloat(-0.1f, -0.1f);
-        v = new Vector2(vx, vy);
+    public Enemy(BulletPool bulletPool, Rect worldBounds) {
+        this.bulletPool = bulletPool;
+        this.worldBounds = worldBounds;
+        v = new Vector2();
+        v0 = new Vector2();
+        bulletV = new Vector2();
     }
 
     @Override
-    public void resize(Rect worldBounds) {
-        this.worldBounds = worldBounds;
-        setHeightProportion(HEIGHT);
-        float posX = Rnd.nextFloat(worldBounds.getLeft(), worldBounds.getRight());
-        float posY = Rnd.nextFloat(worldBounds.getBottom(), worldBounds.getTop());
-        this.pos.set(posX, posY);
+    public void update(float delta) {
+        super.update(delta);
+        if (getBottom() <= worldBounds.getBottom()) {
+            destroy();
+        }
     }
 
-    public void update(float delta) {
-        pos.mulAdd(v, delta);
-        scale += 0.01f;
-        animateTimer += delta;
-        if (animateTimer >= animateInterval) {
-            animateTimer = 0;
-            scale = 1f;
-        }
-        if (getTop() < worldBounds.getBottom()) {
-            setBottom(worldBounds.getTop());
-        }
-        if (getLeft() > worldBounds.getRight()) {
-            setRight(worldBounds.getLeft());
-        }
-        if (getRight() < worldBounds.getLeft()) {
-            setLeft(worldBounds.getRight());
-        }
+    public void set(
+            TextureRegion[] regions,
+            Vector2 v0,
+            TextureRegion bulletRegion,
+            float bulletHeight,
+            float bulletVY,
+            int damage,
+            float reloadInterval,
+            Sound shootSound,
+            int hp,
+            float height
+    ) {
+        this.regions = regions;
+        this.v0.set(v0);
+        this.bulletRegion = bulletRegion;
+        this.bulletHeight = bulletHeight;
+        this.bulletV.set(0, bulletVY);
+        this.damage = damage;
+        this.reloadInterval = reloadInterval;
+        this.reloadTimer = reloadInterval;
+        this.shootSound = shootSound;
+        this.hp = hp;
+        this.v.set(v0);
+        setHeightProportion(height);
     }
 }
