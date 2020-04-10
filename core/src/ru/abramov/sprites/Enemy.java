@@ -21,6 +21,14 @@ public class Enemy extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
+        if (getBottom() + getHalfHeight() >= worldBounds.getTop()) {
+            reloadTimer = reloadInterval * 0.9f;
+            v.scl(1.05f);
+        } else if (getTop() > worldBounds.getTop() && v.y<= v0.y) {
+            v.scl(0.9f);
+        } else {
+            v.set(v0);
+        }
         if (getBottom() <= worldBounds.getBottom()) {
             destroy();
         }
@@ -45,7 +53,7 @@ public class Enemy extends Ship {
         this.bulletV.set(0, bulletVY);
         this.damage = damage;
         this.reloadInterval = reloadInterval;
-        this.reloadTimer = reloadInterval*0.9f;
+        this.reloadTimer = 0f;
         this.shootSound = shootSound;
         this.hp = hp;
         this.v.set(v0);

@@ -16,6 +16,7 @@ import ru.abramov.math.Rect;
 import ru.abramov.pool.BulletPool;
 import ru.abramov.pool.EnemyPool;
 import ru.abramov.sprites.Background;
+import ru.abramov.sprites.Bullet;
 import ru.abramov.sprites.Enemy;
 import ru.abramov.sprites.Hero;
 import ru.abramov.sprites.Star;
@@ -46,7 +47,7 @@ public class GameScreen extends BaseScreen {
         super.show();
         bg = new Texture("background.jpg");
         atlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
-        bulletPool= new BulletPool();
+        bulletPool = new BulletPool();
         enemyPool = new EnemyPool(bulletPool, worldBounds);
         laserSound = Gdx.audio.newSound(Gdx.files.internal("sounds/laser.wav"));
         bulletSound = Gdx.audio.newSound(Gdx.files.internal("sounds/piu.mp3"));
@@ -105,15 +106,15 @@ public class GameScreen extends BaseScreen {
             background = new Background(bg);
             stars = new Star[STAR_COUNT];
             for (int i = 0; i < STAR_COUNT; i++) {
-                stars[i] =  new Star(atlas);
+                stars[i] = new Star(atlas);
             }
-            hero = new Hero(atlas,bulletPool,bulletSound);
+            hero = new Hero(atlas, bulletPool, bulletSound);
         } catch (GameException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void update (float deltatime){
+    private void update(float deltatime) {
         for (Star star : stars) {
             star.update(deltatime);
         }
@@ -125,6 +126,7 @@ public class GameScreen extends BaseScreen {
 
     private void checkCollisions() {
         List<Enemy> enemyList = enemyPool.getActiveObjects();
+        List<Bullet> bulletList = bulletPool.getActiveObjects();
         for (Enemy enemy : enemyList) {
             if (enemy.isDestroyed()) {
                 continue;
@@ -132,6 +134,14 @@ public class GameScreen extends BaseScreen {
             float minDist = enemy.getHalfWidth() + hero.getHalfWidth();
             if (hero.pos.dst(enemy.pos) < minDist) {
                 enemy.destroy();
+            }
+            for (Bullet bullet : bulletList) {
+                if (bullet.getOwner() != hero || bullet.isDestroyed()) {
+                    continue;
+                }
+                if (!bullet.isOutside(enemy)) {
+                    enemy.destroy();
+                }
             }
         }
     }
@@ -141,7 +151,7 @@ public class GameScreen extends BaseScreen {
         enemyPool.freeAllDestroyedActiveObjects();
     }
 
-    private void draw(){
+    private void draw() {
         Gdx.gl.glClearColor(0.5f, 0.7f, 0.8f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
@@ -154,6 +164,7 @@ public class GameScreen extends BaseScreen {
         enemyPool.drawActiveSprites(batch);
         batch.end();
     }
+
     @Override
     public void dispose() {
         bg.dispose();
