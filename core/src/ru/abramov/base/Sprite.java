@@ -1,6 +1,5 @@
 package ru.abramov.base;
 
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -14,7 +13,6 @@ public class Sprite extends Rect {
     protected float scale = 1f; //
     protected TextureRegion[] regions; // массив текстур
     protected int frame; //указатель на текущую текстуру
-    protected Sound sound;
     private boolean destroyed = false;
 
     public Sprite(TextureRegion region) throws GameException {

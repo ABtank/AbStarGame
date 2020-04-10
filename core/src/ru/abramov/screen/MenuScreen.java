@@ -35,10 +35,7 @@ public class MenuScreen extends BaseScreen {
     private ButtonPlay buttonPlay;
 
     public MenuScreen(Game game) {
-        music = Gdx.audio.newMusic(Gdx.files.internal("sounds/song.mp3"));
         this.game = game;
-        music.play();
-        music.setLooping(true);
     }
 
     @Override

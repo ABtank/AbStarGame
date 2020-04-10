@@ -1,30 +1,21 @@
 package ru.abramov.sprites;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 
-import ru.abramov.base.Sprite;
+import ru.abramov.base.Ship;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 import ru.abramov.pool.BulletPool;
 
-public class Hero extends Sprite {
+public class Hero extends Ship {
+
     private static final float SHIP_HEIGHT = 0.15f;
     private static final float BOTTOM_MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
 
-    private Rect worldBounds;
-    private BulletPool bulletPool;
-    private TextureRegion bulletRegion;
-    private Vector2 bulletV;
-    private float bulletInterval = 0.3f;
-    private float bulletTimer;
-
-    private final Vector2 v0; //движение по оси х вправо
-    private final Vector2 v;  //вектор фактической скорости
 
     private boolean pressedLeft; //состояния нажатия клавиши
     private boolean pressedRight;
@@ -33,14 +24,19 @@ public class Hero extends Sprite {
     private int rightPointer = INVALID_POINTER;
 
 
-    public Hero(TextureAtlas atlas, BulletPool bulletPool) throws GameException {
+    public Hero(TextureAtlas atlas, BulletPool bulletPool,  Sound shootSound) throws GameException {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletPool = bulletPool;
+        this.shootSound = shootSound;
         bulletRegion = atlas.findRegion("bulletMainShip");
         bulletV = new Vector2(0, 0.5f);
         v0 = new Vector2(0.5f, 0);
         v = new Vector2();
-        sound = Gdx.audio.newSound(Gdx.files.internal("sounds/piu.mp3"));
+        reloadInterval = 0.4f;
+        reloadTimer = reloadInterval;
+        bulletHeight = 0.01f;
+        damage = 1;
+        hp = 100;
     }
 
     @Override
@@ -52,7 +48,7 @@ public class Hero extends Sprite {
 
     @Override
     public void update(float delta) {
-        pos.mulAdd(v, delta);
+        super.update(delta);
         if (getLeft() < worldBounds.getLeft()) {
             setLeft(worldBounds.getLeft());
             stop();
@@ -61,12 +57,6 @@ public class Hero extends Sprite {
             setRight(worldBounds.getRight());
             stop();
         }
-        bulletTimer += delta;
-        if (bulletTimer >= bulletInterval) {
-            bulletTimer = 0;
-            shoot();
-        }
-
     }
 
     @Override
@@ -119,8 +109,6 @@ public class Hero extends Sprite {
                 pressedRight = true;
                 moveRight();
                 break;
-            case Input.Keys.UP:
-                shoot();
         }
         return false;
     }
@@ -149,11 +137,6 @@ public class Hero extends Sprite {
         return false;
     }
 
-    public void shoot() {
-        Bullet bullet = bulletPool.obtain();
-        bullet.set(this, bulletRegion, pos, bulletV, 0.01f, worldBounds, 1);
-        sound.play(0.5f);
-    }
 
     private void moveRight() {
         v.set(v0);

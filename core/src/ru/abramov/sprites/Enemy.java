@@ -27,16 +27,16 @@ public class Enemy extends Ship {
     }
 
     public void set(
-            TextureRegion[] regions,
-            Vector2 v0,
-            TextureRegion bulletRegion,
-            float bulletHeight,
-            float bulletVY,
-            int damage,
-            float reloadInterval,
-            Sound shootSound,
-            int hp,
-            float height
+            TextureRegion[] regions,        // регион корабля
+            Vector2 v0,                     // начальная скорость
+            TextureRegion bulletRegion,     // регион пули
+            float bulletHeight,             // размер пули
+            float bulletVY,                 // скорость пули по оси у
+            int damage,                     // урон пули
+            float reloadInterval,           // перезарядка
+            Sound shootSound,               // звук выстрела
+            int hp,                         // жизни
+            float height                    // размер корабля
     ) {
         this.regions = regions;
         this.v0.set(v0);
@@ -45,7 +45,7 @@ public class Enemy extends Ship {
         this.bulletV.set(0, bulletVY);
         this.damage = damage;
         this.reloadInterval = reloadInterval;
-        this.reloadTimer = reloadInterval;
+        this.reloadTimer = reloadInterval*0.9f;
         this.shootSound = shootSound;
         this.hp = hp;
         this.v.set(v0);
