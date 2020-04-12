@@ -7,20 +7,36 @@ import com.badlogic.gdx.math.Vector2;
 import ru.abramov.base.Ship;
 import ru.abramov.math.Rect;
 import ru.abramov.pool.BulletPool;
+import ru.abramov.pool.ExplosionPool;
 
 public class Enemy extends Ship {
 
-    public Enemy(BulletPool bulletPool, Rect worldBounds) {
+    private final Vector2 descentV;
+
+    public Enemy(BulletPool bulletPool, ExplosionPool explosionPool, Rect worldBounds) {
         this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
         this.worldBounds = worldBounds;
         v = new Vector2();
         v0 = new Vector2();
         bulletV = new Vector2();
+        bulletPos = new Vector2();
+        descentV = new Vector2(0, -0.3f);
     }
 
     @Override
     public void update(float delta) {
         super.update(delta);
+        bulletPos.set(pos.x, pos.y - getHalfHeight());
+        if (getBottom() + getHalfHeight() >= worldBounds.getTop()) {
+            reloadTimer = reloadInterval * 0.9f;
+            v.scl(1.05f);
+        } else if (getTop() > worldBounds.getTop() && v.y<= v0.y) {
+            v.scl(0.9f);
+        } else {
+            v.set(v0);
+            autoShoot(delta);
+        }
         if (getBottom() <= worldBounds.getBottom()) {
             destroy();
         }
@@ -45,10 +61,18 @@ public class Enemy extends Ship {
         this.bulletV.set(0, bulletVY);
         this.damage = damage;
         this.reloadInterval = reloadInterval;
-        this.reloadTimer = reloadInterval*0.9f;
+        this.reloadTimer = reloadInterval;
         this.shootSound = shootSound;
         this.hp = hp;
-        this.v.set(v0);
+        this.v.set(descentV);
         setHeightProportion(height);
+    }
+
+    public boolean isBulletCollision(Rect bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getBottom() > getTop()
+                || bullet.getTop() < pos.y
+        );
     }
 }

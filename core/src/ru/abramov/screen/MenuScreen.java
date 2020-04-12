@@ -57,6 +57,8 @@ public class MenuScreen extends BaseScreen {
     public void resize(Rect worldBounds) {
         background.resize(worldBounds);
         logo.resize(worldBounds);
+        logo.setHeightProportion(0.25f);
+        logo.setTop(0.25f);
         for (Star star : stars) {
             star.resize(worldBounds);
         }

@@ -9,6 +9,7 @@ import ru.abramov.base.Ship;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 import ru.abramov.pool.BulletPool;
+import ru.abramov.pool.ExplosionPool;
 
 public class Hero extends Ship {
 
@@ -24,9 +25,10 @@ public class Hero extends Ship {
     private int rightPointer = INVALID_POINTER;
 
 
-    public Hero(TextureAtlas atlas, BulletPool bulletPool,  Sound shootSound) throws GameException {
+    public Hero(TextureAtlas atlas, BulletPool bulletPool, ExplosionPool explosionPool, Sound shootSound) throws GameException {
         super(atlas.findRegion("main_ship"), 1, 2, 2);
         this.bulletPool = bulletPool;
+        this.explosionPool = explosionPool;
         this.shootSound = shootSound;
         bulletRegion = atlas.findRegion("bulletMainShip");
         bulletV = new Vector2(0, 0.5f);
@@ -36,7 +38,7 @@ public class Hero extends Ship {
         reloadTimer = reloadInterval;
         bulletHeight = 0.01f;
         damage = 1;
-        hp = 100;
+        hp = 5;
     }
 
     @Override
@@ -49,6 +51,7 @@ public class Hero extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
+        autoShoot(delta);
         if (getLeft() < worldBounds.getLeft()) {
             setLeft(worldBounds.getLeft());
             stop();
@@ -137,6 +140,13 @@ public class Hero extends Ship {
         return false;
     }
 
+    public boolean isBulletCollision(Rect bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getTop() < getBottom()
+                || bullet.getBottom() > pos.y
+        );
+    }
 
     private void moveRight() {
         v.set(v0);
