@@ -88,6 +88,10 @@ public class Sprite extends Rect {
         destroyed = true;
     }
 
+    public void alive() {
+        destroyed = false;
+    }
+
     public boolean isDestroyed() {
         return destroyed;
     }

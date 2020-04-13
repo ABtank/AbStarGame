@@ -17,6 +17,8 @@ public class Hero extends Ship {
     private static final float BOTTOM_MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
 
+    private int startHp = 5;
+
 
     private boolean pressedLeft; //состояния нажатия клавиши
     private boolean pressedRight;
@@ -32,13 +34,14 @@ public class Hero extends Ship {
         this.shootSound = shootSound;
         bulletRegion = atlas.findRegion("bulletMainShip");
         bulletV = new Vector2(0, 0.5f);
+        bulletPos = new Vector2();
         v0 = new Vector2(0.5f, 0);
         v = new Vector2();
         reloadInterval = 0.4f;
         reloadTimer = reloadInterval;
         bulletHeight = 0.01f;
         damage = 1;
-        hp = 5;
+        hp = startHp;
     }
 
     @Override
@@ -51,6 +54,7 @@ public class Hero extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
+        bulletPos.set(pos.x, pos.y + getHalfHeight());
         autoShoot(delta);
         if (getLeft() < worldBounds.getLeft()) {
             setLeft(worldBounds.getLeft());
@@ -158,5 +162,11 @@ public class Hero extends Ship {
 
     private void stop() {
         v.setZero();
+    }
+
+    public void startNewGameScreen() {
+        super.alive();
+        hp = startHp;
+        setBottom(worldBounds.getBottom() + BOTTOM_MARGIN);
     }
 }
