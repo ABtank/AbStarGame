@@ -13,20 +13,23 @@ import java.util.List;
 import ru.abramov.base.BaseScreen;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
-import ru.abramov.math.Rnd;
 import ru.abramov.pool.BulletPool;
 import ru.abramov.pool.EnemyPool;
 import ru.abramov.pool.ExplosionPool;
 import ru.abramov.sprites.Background;
 import ru.abramov.sprites.Bullet;
+import ru.abramov.sprites.ButtonNewGame;
 import ru.abramov.sprites.Enemy;
 import ru.abramov.sprites.GameOver;
 import ru.abramov.sprites.Hero;
-import ru.abramov.sprites.ButtonNewGame;
+import ru.abramov.sprites.Logo;
 import ru.abramov.sprites.Star;
 import ru.abramov.utils.EnemyEmitter;
 
 public class GameScreen extends BaseScreen {
+
+    private Texture lg;
+    private Logo logo;
 
     private enum State {PLAYING, PAUSE, GAME_OVER, WIN}
 
@@ -62,6 +65,7 @@ public class GameScreen extends BaseScreen {
         laserSound = Gdx.audio.newSound(Gdx.files.internal("sounds/laser.wav"));
         bulletSound = Gdx.audio.newSound(Gdx.files.internal("sounds/piu.mp3"));
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
+        lg = new Texture("menuScreen.png");
         bulletPool = new BulletPool();
         explosionPool = new ExplosionPool(atlas, explosionSound);
         enemyPool = new EnemyPool(bulletPool, explosionPool, worldBounds);
@@ -89,6 +93,9 @@ public class GameScreen extends BaseScreen {
         background.resize(worldBounds);
         hero.resize(worldBounds);
         gameOver.resize(worldBounds);
+        logo.resize(worldBounds);
+        logo.setHeightProportion(0.25f);
+        logo.setTop(0.4f);
         for (Star star : stars) {
             star.resize(worldBounds);
         }
@@ -136,6 +143,7 @@ public class GameScreen extends BaseScreen {
         try {
             background = new Background(bg);
             stars = new Star[STAR_COUNT];
+            logo = new Logo(lg);
             gameOver = new GameOver(atlas);
             buttonNewGame = new ButtonNewGame(atlas,this);
             for (int i = 0; i < STAR_COUNT; i++) {
@@ -157,6 +165,8 @@ public class GameScreen extends BaseScreen {
             bulletPool.updateActiveSprites(deltatime);
             enemyPool.updateActiveSprites(deltatime);
             enemyEmitter.generate(deltatime);
+        } else if(state == State.GAME_OVER) {
+            buttonNewGame.update(deltatime);
         }
     }
 
@@ -223,6 +233,7 @@ public class GameScreen extends BaseScreen {
                 enemyPool.drawActiveSprites(batch);
                 break;
             case GAME_OVER:
+                logo.draw(batch);
                 gameOver.draw(batch);
                 buttonNewGame.draw(batch);
                 System.out.println("GAME_OVER");
@@ -234,21 +245,16 @@ public class GameScreen extends BaseScreen {
 
     public void startNewGameScreen(){
         state = State.PLAYING;
-        bulletPool.freeAllDestroyedActiveObjects();
-        explosionPool.freeAllDestroyedActiveObjects();
-        enemyPool.freeAllDestroyedActiveObjects();
-        hero.startNewGameScreen();
-        List<Enemy> enemyList = enemyPool.getActiveObjects();
-        for (Enemy enemy : enemyList) {
-            enemy.pos.x = Rnd.nextFloat(worldBounds.getLeft() + enemy.getHalfWidth(), worldBounds.getRight() - enemy.getHalfWidth());
-            enemy.setBottom(worldBounds.getTop());
-        }
-
+        bulletPool.freeAllActiveObjects();
+        enemyPool.freeAllActiveObjects();
+        explosionPool.freeAllActiveObjects();
+        hero.startNewGameScreen(worldBounds);
     }
 
     @Override
     public void dispose() {
         bg.dispose();
+        lg.dispose();
         atlas.dispose();
         bulletPool.dispose();
         enemyPool.dispose();

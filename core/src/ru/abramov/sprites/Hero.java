@@ -164,9 +164,14 @@ public class Hero extends Ship {
         v.setZero();
     }
 
-    public void startNewGameScreen() {
-        super.alive();
+    public void startNewGameScreen(Rect worldBounds) {
+        flushDestroy();
         hp = startHp;
-        setBottom(worldBounds.getBottom() + BOTTOM_MARGIN);
+        pressedLeft = false;
+        pressedRight = false;
+        leftPointer = INVALID_POINTER;
+        rightPointer = INVALID_POINTER;
+        stop();
+        pos.x = worldBounds.pos.x;
     }
 }
