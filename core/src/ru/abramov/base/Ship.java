@@ -47,7 +47,7 @@ public abstract class Ship extends Sprite {
         if (savedDelta == 0f) {
             savedDelta = delta;
         }
-        if (delta > savedDelta*DELTA_COEFF) {
+        if (delta > savedDelta * DELTA_COEFF) {
             delta = savedDelta;
         }
         pos.mulAdd(v, delta);

@@ -16,7 +16,7 @@ public class Perk extends Sprite {
     private Rect worldBounds;
 
     public Perk(Rect worldBounds) {
-        this.worldBounds=worldBounds;
+        this.worldBounds = worldBounds;
         float vx = Rnd.nextFloat(-0.005f, 0.005f);
         float vy = Rnd.nextFloat(-0.05f, -0.1f);
         v = new Vector2(vx, vy);
@@ -44,6 +44,7 @@ public class Perk extends Sprite {
         this.effect = frame;
         setHeightProportion(height);
     }
+
     public void set(
             TextureRegion[] regions,
             float fbonus,

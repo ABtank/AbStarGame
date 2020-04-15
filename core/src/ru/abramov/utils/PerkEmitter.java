@@ -39,7 +39,7 @@ public class PerkEmitter {
     public void generate(Enemy enemy) {
         float chance = (float) Math.random();
         int framePerk = random.nextInt(10);
-        System.out.println("perk= " + framePerk + "\nchance= "+chance);
+        System.out.println("perk= " + framePerk + "\nchance= " + chance);
         if (chance > 0.1f) {
             Perk perk = perkPool.obtain();
             switch (framePerk) {

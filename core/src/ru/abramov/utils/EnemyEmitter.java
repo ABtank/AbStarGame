@@ -123,8 +123,8 @@ public class EnemyEmitter {
         return generateInterval;
     }
 
-    public void setGenerateInterval(){
-        generateInterval-=0.5f;
+    public void setGenerateInterval() {
+        generateInterval -= 0.5f;
     }
 
     public int getLevel() {

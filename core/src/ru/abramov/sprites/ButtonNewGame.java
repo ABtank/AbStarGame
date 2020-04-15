@@ -26,7 +26,7 @@ public class ButtonNewGame extends ScaleButton {
     @Override
     public void resize(Rect worldBounds) {
         setHeightProportion(0.065f);
-        setBottom(- 0.2f);
+        setBottom(-0.2f);
     }
 
     @Override
