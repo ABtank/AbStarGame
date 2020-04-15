@@ -14,6 +14,8 @@ import ru.abramov.sprites.Explosion;
 public abstract class Ship extends Sprite {
 
     protected static final float DAMAGE_ANIMATE_INTERVAL = 0.1f;
+    private static final float DELTA_COEFF = 1.2f;
+    private float savedDelta = 0f;
 
     protected Rect worldBounds;
     protected BulletPool bulletPool;
@@ -42,6 +44,12 @@ public abstract class Ship extends Sprite {
 
     @Override
     public void update(float delta) {
+        if (savedDelta == 0f) {
+            savedDelta = delta;
+        }
+        if (delta > savedDelta*DELTA_COEFF) {
+            delta = savedDelta;
+        }
         pos.mulAdd(v, delta);
         damageAnimateTimer += delta;
         if (damageAnimateTimer >= DAMAGE_ANIMATE_INTERVAL) {
@@ -65,8 +73,22 @@ public abstract class Ship extends Sprite {
         }
     }
 
+    public void setDamage(int damage) {
+        this.damage += damage;
+    }
+
     public int getDamage() {
         return damage;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+    }
+
+    public void setV0(float v0) {
     }
 
     protected void autoShoot(float delta) {

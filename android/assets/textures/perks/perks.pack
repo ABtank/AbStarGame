@@ -1,0 +1,12 @@
+
+perks.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+all-perks25
+  rotate: false
+  xy: 1, 1
+  size: 840, 371
+  orig: 840, 371
+  offset: 0, 0
+  index: -1

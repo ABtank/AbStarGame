@@ -7,24 +7,30 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Align;
 
 import java.util.List;
 
 import ru.abramov.base.BaseScreen;
+import ru.abramov.base.Font;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 import ru.abramov.pool.BulletPool;
 import ru.abramov.pool.EnemyPool;
 import ru.abramov.pool.ExplosionPool;
+import ru.abramov.pool.PerkPool;
 import ru.abramov.sprites.Background;
 import ru.abramov.sprites.Bullet;
 import ru.abramov.sprites.ButtonNewGame;
 import ru.abramov.sprites.Enemy;
 import ru.abramov.sprites.GameOver;
+import ru.abramov.sprites.GameWin;
 import ru.abramov.sprites.Hero;
 import ru.abramov.sprites.Logo;
+import ru.abramov.sprites.Perk;
 import ru.abramov.sprites.Star;
 import ru.abramov.utils.EnemyEmitter;
+import ru.abramov.utils.PerkEmitter;
 
 public class GameScreen extends BaseScreen {
 
@@ -34,6 +40,11 @@ public class GameScreen extends BaseScreen {
     private enum State {PLAYING, PAUSE, GAME_OVER, WIN}
 
     private static final int STAR_COUNT = 64;
+    private static final float FONT_MARGIN = 0.01f;
+    private static final float FONT_SIZE = 0.02f;
+    private static final String SCORE = "Score: ";
+    private static final String HP = "HP: ";
+    private static final String LEVEL = "Level: ";
 
     private Hero hero;
 
@@ -41,41 +52,66 @@ public class GameScreen extends BaseScreen {
     private Background background;
 
     private TextureAtlas atlas;
+    private TextureAtlas perksAtlas;
     private Star[] stars;
     private GameOver gameOver;
+    private GameWin gameWin;
     private ButtonNewGame buttonNewGame;
 
     private BulletPool bulletPool;
     private EnemyPool enemyPool;
     private ExplosionPool explosionPool;
+    private PerkPool perkPool;
 
     private EnemyEmitter enemyEmitter;
+    private PerkEmitter perkEmitter;
 
     private Music music;
     private Sound laserSound;
     private Sound bulletSound;
     private Sound explosionSound;
     private State state;
+    private State prevState;
+
+    private Font font;
+    private StringBuilder sbFrags;
+    private StringBuilder sbHP;
+    private StringBuilder sbLevel;
+
+    private int frags;
+    private int score;
+    private int win = 10000;
 
     @Override
     public void show() {
         super.show();
         bg = new Texture("background.jpg");
         atlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
+        perksAtlas = new TextureAtlas(Gdx.files.internal("textures/perks/perks.pack"));
         laserSound = Gdx.audio.newSound(Gdx.files.internal("sounds/laser.wav"));
         bulletSound = Gdx.audio.newSound(Gdx.files.internal("sounds/piu.mp3"));
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
         lg = new Texture("menuScreen.png");
         bulletPool = new BulletPool();
+        perkPool = new PerkPool(worldBounds);
         explosionPool = new ExplosionPool(atlas, explosionSound);
         enemyPool = new EnemyPool(bulletPool, explosionPool, worldBounds);
         enemyEmitter = new EnemyEmitter(atlas, enemyPool, worldBounds, laserSound);
+        perkEmitter = new PerkEmitter(perksAtlas, perkPool, worldBounds);
+        font = new Font("font/font.fnt", "font/font.png");
+        font.setSize(FONT_SIZE);
+        sbFrags = new StringBuilder();
+        sbHP = new StringBuilder();
+        sbLevel = new StringBuilder();
         music = Gdx.audio.newMusic(Gdx.files.internal("sounds/song.mp3"));
         music.setLooping(true);
         music.setVolume(0.1f);
         music.play();
         initSprites();
         state = State.PLAYING;
+        prevState = State.PLAYING;
+        frags = 0;
+        score = 0;
     }
 
     @Override
@@ -93,6 +129,7 @@ public class GameScreen extends BaseScreen {
         background.resize(worldBounds);
         hero.resize(worldBounds);
         gameOver.resize(worldBounds);
+        gameWin.resize(worldBounds);
         logo.resize(worldBounds);
         logo.setHeightProportion(0.25f);
         logo.setTop(0.4f);
@@ -122,7 +159,7 @@ public class GameScreen extends BaseScreen {
     public boolean touchDown(Vector2 touch, int pointer, int button) {
         if (state == State.PLAYING) {
             hero.touchDown(touch, pointer, button);
-        } else if (state == State.GAME_OVER) {
+        } else if (state == State.GAME_OVER || state == State.WIN) {
             buttonNewGame.touchDown(touch, pointer, button);
         }
         return false;
@@ -133,7 +170,7 @@ public class GameScreen extends BaseScreen {
         if (state == State.PLAYING) {
             hero.touchUp(touch, pointer, button);
             return super.touchUp(touch, pointer, button);
-        } else if (state == State.GAME_OVER) {
+        } else if (state == State.GAME_OVER || state == State.WIN) {
             buttonNewGame.touchUp(touch, pointer, button);
         }
         return false;
@@ -145,7 +182,8 @@ public class GameScreen extends BaseScreen {
             stars = new Star[STAR_COUNT];
             logo = new Logo(lg);
             gameOver = new GameOver(atlas);
-            buttonNewGame = new ButtonNewGame(atlas,this);
+            gameWin = new GameWin();
+            buttonNewGame = new ButtonNewGame(atlas, this);
             for (int i = 0; i < STAR_COUNT; i++) {
                 stars[i] = new Star(atlas);
             }
@@ -159,13 +197,14 @@ public class GameScreen extends BaseScreen {
         for (Star star : stars) {
             star.update(deltatime);
         }
-        explosionPool.updateActiveSprites(deltatime);
         if (state == State.PLAYING) {
             hero.update(deltatime);
+            explosionPool.updateActiveSprites(deltatime);
             bulletPool.updateActiveSprites(deltatime);
             enemyPool.updateActiveSprites(deltatime);
-            enemyEmitter.generate(deltatime);
-        } else if(state == State.GAME_OVER) {
+            perkPool.updateActiveSprites(deltatime);
+            enemyEmitter.generate(deltatime, frags);
+        } else if (state == State.GAME_OVER || state == State.WIN) {
             buttonNewGame.update(deltatime);
         }
     }
@@ -176,6 +215,7 @@ public class GameScreen extends BaseScreen {
         }
         List<Enemy> enemyList = enemyPool.getActiveObjects();
         List<Bullet> bulletList = bulletPool.getActiveObjects();
+        List<Perk> perks = perkPool.getActiveObjects();
         for (Enemy enemy : enemyList) {
             if (enemy.isDestroyed()) {
                 continue;
@@ -183,6 +223,12 @@ public class GameScreen extends BaseScreen {
             float minDist = enemy.getHalfWidth() + hero.getHalfWidth();
             if (hero.pos.dst(enemy.pos) < minDist) {
                 enemy.destroy();
+                frags++;
+                score += enemy.getDamage();
+                perkEmitter.generate(enemy);
+                if (score == win || enemyEmitter.getGenerateInterval() <= 0) {
+                    state = State.WIN;
+                }
                 hero.damage(enemy.getDamage());
             }
             for (Bullet bullet : bulletList) {
@@ -192,11 +238,22 @@ public class GameScreen extends BaseScreen {
                 if (enemy.isBulletCollision(bullet)) {
                     enemy.damage(bullet.getDamage());
                     bullet.destroy();
+                    if (enemy.isDestroyed()) {
+                        frags++;
+                        score += enemy.getDamage();
+                        perkEmitter.generate(enemy);
+                        if (score == win || enemyEmitter.getGenerateInterval() <= 0) {
+                            state = State.WIN;
+                        }
+                    }
                 }
             }
             if (hero.isDestroyed()) {
                 state = State.GAME_OVER;
             }
+        }
+        if (frags == 200 || frags == 400 || frags == 600 || frags == 800) {
+            enemyEmitter.setGenerateInterval();
         }
         for (Bullet bullet : bulletList) {
             if (bullet.getOwner() == hero || bullet.isDestroyed()) {
@@ -207,12 +264,32 @@ public class GameScreen extends BaseScreen {
                 bullet.destroy();
             }
         }
+        for (Perk perk : perks) {
+            if (perk.isDestroyed()) {
+                continue;
+            }
+            float minDist = perk.getHalfWidth() + hero.getHalfWidth();
+            if (hero.pos.dst(perk.pos) < minDist) {
+                switch (perk.effect) {
+                    case 1:
+                        hero.setDamage(perk.bonus);
+                        break;
+                    case 4:
+                        hero.setHp(perk.bonus);
+                        break;
+                    case 5:
+                        hero.setV0(perk.fbonus);
+                }
+                perk.destroy();
+            }
+        }
     }
 
     public void freeAllDestroyed() {
         bulletPool.freeAllDestroyedActiveObjects();
         enemyPool.freeAllDestroyedActiveObjects();
         explosionPool.freeAllDestroyedActiveObjects();
+        perkPool.freeAllDestroyedActiveObjects();
     }
 
     private void draw() {
@@ -231,33 +308,66 @@ public class GameScreen extends BaseScreen {
                 hero.draw(batch);
                 bulletPool.drawActiveSprites(batch);
                 enemyPool.drawActiveSprites(batch);
+                explosionPool.drawActiveSprites(batch);
+                perkPool.drawActiveSprites(batch);
                 break;
             case GAME_OVER:
                 logo.draw(batch);
                 gameOver.draw(batch);
                 buttonNewGame.draw(batch);
-                System.out.println("GAME_OVER");
                 break;
+            case WIN:
+                logo.draw(batch);
+                gameWin.draw(batch);
+                buttonNewGame.draw(batch);
         }
-        explosionPool.drawActiveSprites(batch);
+        printInfo();
         batch.end();
     }
 
-    public void startNewGameScreen(){
+    private void printInfo() {
+        sbFrags.setLength(0);
+        sbHP.setLength(0);
+        sbLevel.setLength(0);
+        font.draw(batch, sbFrags.append(SCORE).append(score), worldBounds.getLeft() + FONT_MARGIN, worldBounds.getTop() - FONT_MARGIN);
+        font.draw(batch, sbHP.append(HP).append(hero.getHp()), worldBounds.pos.x, worldBounds.getTop() - FONT_MARGIN, Align.center);
+        font.draw(batch, sbLevel.append(LEVEL).append(enemyEmitter.getLevel()), worldBounds.getRight() - FONT_MARGIN, worldBounds.getTop() - FONT_MARGIN, Align.right);
+    }
+
+    public void startNewGameScreen() {
         state = State.PLAYING;
+        hero.startNewGameScreen(worldBounds);
+        frags = 0;
+        score = 0;
         bulletPool.freeAllActiveObjects();
         enemyPool.freeAllActiveObjects();
         explosionPool.freeAllActiveObjects();
-        hero.startNewGameScreen(worldBounds);
+        perkPool.freeAllActiveObjects();
+    }
+
+    @Override
+    public void pause() {
+        prevState = state;
+        state = State.PAUSE;
+        music.pause();
+    }
+
+    @Override
+    public void resume() {
+        state = prevState;
+        music.play();
     }
 
     @Override
     public void dispose() {
         bg.dispose();
         lg.dispose();
+        font.dispose();
         atlas.dispose();
         bulletPool.dispose();
         enemyPool.dispose();
+        explosionPool.dispose();
+        perkPool.dispose();
         music.dispose();
         laserSound.dispose();
         bulletSound.dispose();
