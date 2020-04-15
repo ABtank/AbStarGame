@@ -13,10 +13,12 @@ import ru.abramov.sprites.Perk;
 
 public class PerkEmitter {
 
-    private static final float PERK_HEIGHT = 0.08f;
+    private static final float PERK_HEIGHT = 0.06f;
+
     private static final int PERK_HP = 10;
     private static final int PERK_DAMAGE = 1;
-    private static final float PERK_SPEED = 1.05f;
+    private static final float PERK_SPEED = 0.02f;
+    private static final float PERK_RELOAD = 0.02f;
     private static final int PERK_DEFAULT = 0;
     private static final Random random = new Random();
 
@@ -51,6 +53,9 @@ public class PerkEmitter {
                     break;
                 case 5:
                     perk.set(perks, PERK_SPEED, framePerk, PERK_HEIGHT);
+                    break;
+                case 7:
+                    perk.set(perks, PERK_RELOAD, framePerk, PERK_HEIGHT);
                     break;
                 default:
                     perk.set(perks, PERK_DEFAULT, framePerk, 0);

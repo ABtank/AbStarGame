@@ -45,6 +45,10 @@ public class GameScreen extends BaseScreen {
     private static final String SCORE = "Score: ";
     private static final String HP = "HP: ";
     private static final String LEVEL = "Level: ";
+    private static final String FRAGS = "Frags: ";
+    private static final String DAMAGE = "Damage: ";
+    private static final String SPEED = "Speed: ";
+    private static final String RELOAD = "Reload: ";
 
     private Hero hero;
 
@@ -77,6 +81,10 @@ public class GameScreen extends BaseScreen {
     private StringBuilder sbFrags;
     private StringBuilder sbHP;
     private StringBuilder sbLevel;
+    private StringBuilder sbScore;
+    private StringBuilder sbDamage;
+    private StringBuilder sbSpeed;
+    private StringBuilder sbReload;
 
     private int frags;
     private int score;
@@ -101,8 +109,12 @@ public class GameScreen extends BaseScreen {
         font = new Font("font/font.fnt", "font/font.png");
         font.setSize(FONT_SIZE);
         sbFrags = new StringBuilder();
-        sbHP = new StringBuilder();
+        sbScore = new StringBuilder();
         sbLevel = new StringBuilder();
+        sbHP = new StringBuilder();
+        sbDamage = new StringBuilder();
+        sbSpeed = new StringBuilder();
+        sbReload = new StringBuilder();
         music = Gdx.audio.newMusic(Gdx.files.internal("sounds/song.mp3"));
         music.setLooping(true);
         music.setVolume(0.1f);
@@ -213,9 +225,14 @@ public class GameScreen extends BaseScreen {
         if (state != State.PLAYING) {
             return;
         }
+        if (frags % 10 == 0) {
+            enemyEmitter.setGenerateInterval(0.2f);
+            frags++;
+        }
         List<Enemy> enemyList = enemyPool.getActiveObjects();
         List<Bullet> bulletList = bulletPool.getActiveObjects();
         List<Perk> perks = perkPool.getActiveObjects();
+
         for (Enemy enemy : enemyList) {
             if (enemy.isDestroyed()) {
                 continue;
@@ -252,9 +269,7 @@ public class GameScreen extends BaseScreen {
                 state = State.GAME_OVER;
             }
         }
-        if (frags == 200 || frags == 400 || frags == 600 || frags == 800) {
-            enemyEmitter.setGenerateInterval();
-        }
+
         for (Bullet bullet : bulletList) {
             if (bullet.getOwner() == hero || bullet.isDestroyed()) {
                 continue;
@@ -264,6 +279,7 @@ public class GameScreen extends BaseScreen {
                 bullet.destroy();
             }
         }
+
         for (Perk perk : perks) {
             if (perk.isDestroyed()) {
                 continue;
@@ -279,6 +295,9 @@ public class GameScreen extends BaseScreen {
                         break;
                     case 5:
                         hero.setV0(perk.fbonus);
+                        break;
+                    case 7:
+                        hero.setReloadInterval(perk.fbonus);
                 }
                 perk.destroy();
             }
@@ -326,12 +345,20 @@ public class GameScreen extends BaseScreen {
     }
 
     private void printInfo() {
+        sbScore.setLength(0);
         sbFrags.setLength(0);
-        sbHP.setLength(0);
         sbLevel.setLength(0);
-        font.draw(batch, sbFrags.append(SCORE).append(score), worldBounds.getLeft() + FONT_MARGIN, worldBounds.getTop() - FONT_MARGIN);
-        font.draw(batch, sbHP.append(HP).append(hero.getHp()), worldBounds.pos.x, worldBounds.getTop() - FONT_MARGIN, Align.center);
+        sbHP.setLength(0);
+        sbDamage.setLength(0);
+        sbSpeed.setLength(0);
+        sbReload.setLength(0);
+        font.draw(batch, sbScore.append(SCORE).append(score), worldBounds.getLeft() + FONT_MARGIN, worldBounds.getTop() - FONT_MARGIN);
+        font.draw(batch, sbFrags.append(FRAGS).append(frags), worldBounds.getLeft() + FONT_MARGIN, worldBounds.getBottom() + FONT_MARGIN * 3);
         font.draw(batch, sbLevel.append(LEVEL).append(enemyEmitter.getLevel()), worldBounds.getRight() - FONT_MARGIN, worldBounds.getTop() - FONT_MARGIN, Align.right);
+        font.draw(batch, sbHP.append(HP).append(hero.getHp()), worldBounds.pos.x, worldBounds.getTop() - FONT_MARGIN, Align.center);
+        font.draw(batch, sbDamage.append(DAMAGE).append(hero.getDamage()), worldBounds.getRight() - FONT_MARGIN, worldBounds.getBottom() + FONT_MARGIN * 3, Align.right);
+        font.draw(batch, sbSpeed.append(SPEED).append(hero.getSpeed()), worldBounds.pos.x-0.15f, worldBounds.getBottom() + FONT_MARGIN * 3);
+        font.draw(batch, sbReload.append(RELOAD).append(hero.getReload()), worldBounds.pos.x, worldBounds.getBottom() + FONT_MARGIN * 3);
     }
 
     public void startNewGameScreen() {
@@ -339,6 +366,7 @@ public class GameScreen extends BaseScreen {
         hero.startNewGameScreen(worldBounds);
         frags = 0;
         score = 0;
+        enemyEmitter.startNewGame();
         bulletPool.freeAllActiveObjects();
         enemyPool.freeAllActiveObjects();
         explosionPool.freeAllActiveObjects();

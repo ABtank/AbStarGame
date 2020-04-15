@@ -74,7 +74,6 @@ public abstract class Ship extends Sprite {
     }
 
     public void setDamage(int damage) {
-        this.damage += damage;
     }
 
     public int getDamage() {
@@ -89,6 +88,8 @@ public abstract class Ship extends Sprite {
     }
 
     public void setV0(float v0) {
+    }
+    public void setReloadInterval(float interval){
     }
 
     protected void autoShoot(float delta) {

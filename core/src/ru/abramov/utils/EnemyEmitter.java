@@ -123,11 +123,18 @@ public class EnemyEmitter {
         return generateInterval;
     }
 
-    public void setGenerateInterval() {
-        generateInterval -= 0.5f;
+    public void setGenerateInterval(float interval) {
+        if ((generateInterval - interval) > interval){
+            generateInterval -= interval;
+        }
     }
 
     public int getLevel() {
         return level;
+    }
+
+    public void startNewGame() {
+        level=1;
+        generateInterval=2f;
     }
 }

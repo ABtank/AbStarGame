@@ -17,7 +17,12 @@ public class Hero extends Ship {
     private static final float BOTTOM_MARGIN = 0.05f;
     private static final int INVALID_POINTER = -1;
 
-    private int startHp = 1000;
+    private int startHp = 100;
+    private int startDamage = 1;
+    private Vector2 startSpeed = new Vector2(0.5f, 0);
+    private float startReloadInterval = 0.2f;
+    private float startBulletHeight = 0.01f;
+    private int maxDamage = 5;
 
 
     private boolean pressedLeft; //состояния нажатия клавиши
@@ -35,12 +40,12 @@ public class Hero extends Ship {
         bulletRegion = atlas.findRegion("bulletMainShip");
         bulletV = new Vector2(0, 0.5f);
         bulletPos = new Vector2();
-        v0 = new Vector2(0.5f, 0);
+        v0 = startSpeed;
         v = new Vector2();
-        reloadInterval = 0.2f;
+        reloadInterval = startReloadInterval;
         reloadTimer = reloadInterval;
-        bulletHeight = 0.01f;
-        damage = 1;
+        bulletHeight = startBulletHeight;
+        damage = startDamage;
         hp = startHp;
     }
 
@@ -167,6 +172,10 @@ public class Hero extends Ship {
     public void startNewGameScreen(Rect worldBounds) {
         flushDestroy();
         hp = startHp;
+        v0 = startSpeed;
+        damage = startDamage;
+        reloadInterval = startReloadInterval;
+        bulletHeight = startBulletHeight;
         pressedLeft = false;
         pressedRight = false;
         leftPointer = INVALID_POINTER;
@@ -177,12 +186,40 @@ public class Hero extends Ship {
 
     @Override
     public void setHp(int hp) {
-        this.hp += hp;
+        if (this.hp <= startHp) {
+            if (this.hp + hp >= startHp) {
+                this.hp = startHp;
+            } else {
+                this.hp += hp;
+            }
+        }
     }
 
     @Override
     public void setV0(float v0) {
-        this.v0.scl(v0);
+        if (this.v0.x < startSpeed.x * 2 - 1)
+            this.v0.x += v0;
     }
 
+    public int getSpeed() {
+        return (int) (v0.x * 100f);
+    }
+
+    public int getReload() {
+        return (int) (reloadInterval * 100f);
+    }
+
+    @Override
+    public void setReloadInterval(float interval) {
+        if (reloadInterval >= 0.1f)
+            reloadInterval -= interval;
+    }
+
+    @Override
+    public void setDamage(int damage) {
+        if (this.damage < maxDamage) {
+            this.damage += damage;
+            bulletHeight += (float) damage / 500;
+        }
+    }
 }
