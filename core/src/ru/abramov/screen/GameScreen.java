@@ -236,9 +236,9 @@ public class GameScreen extends BaseScreen {
         if (state != State.PLAYING) {
             return;
         }
-        if (enemyEmitter.getLevel() % 2 == 0) {
+        if (frags % 10 == 0) {
+            frags++;
             enemyEmitter.setGenerateInterval(0.2f);
-            enemyEmitter.setLevel();
         }
         List<Enemy> enemyList = enemyPool.getActiveObjects();
         List<Bullet> bulletList = bulletPool.getActiveObjects();
@@ -254,7 +254,7 @@ public class GameScreen extends BaseScreen {
                 frags++;
                 score += enemy.getDamage();
                 perkEmitter.generate(enemy);
-                if (score > win || enemyEmitter.getGenerateInterval() <= 0) {
+                if (enemyEmitter.getLevel() > win) {
                     state = State.WIN;
                 }
                 hero.damage(enemy.getDamage());
@@ -270,7 +270,7 @@ public class GameScreen extends BaseScreen {
                         frags++;
                         score += enemy.getDamage();
                         perkEmitter.generate(enemy);
-                        if (score > win || enemyEmitter.getGenerateInterval() <= 0) {
+                        if (enemyEmitter.getLevel() > win) {
                             state = State.WIN;
                         }
                     }
@@ -331,10 +331,10 @@ public class GameScreen extends BaseScreen {
     }
 
     private void writeScoreToFile(int score) {
+        record();
         try (FileWriter out = new FileWriter("score.txt", true)) {
             out.write(score + "\n");
             out.flush();
-            record();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -408,7 +408,7 @@ public class GameScreen extends BaseScreen {
         font.draw(batch, sbReload.append(RELOAD).append(hero.getReload()), worldBounds.pos.x, worldBounds.getBottom() + FONT_MARGIN * 3);
         if (state == State.GAME_OVER || state == State.WIN) {
             if (score > record) {
-                font.draw(batch, sbRecord.append("THIS NEW ").append(RECORD).append(record), worldBounds.pos.x, worldBounds.pos.y + 0.1f, Align.center);
+                font.draw(batch, sbRecord.append("THIS NEW ").append(RECORD).append(score), worldBounds.pos.x, worldBounds.pos.y + 0.1f, Align.center);
             } else {
                 font.draw(batch, sbResultScore.append(RESULT_SCORE).append(score), worldBounds.pos.x, worldBounds.pos.y + 0.15f, Align.center);
                 font.draw(batch, sbRecord.append(RECORD).append(record), worldBounds.pos.x, worldBounds.pos.y + 0.1f, Align.center);

@@ -23,6 +23,7 @@ public class Hero extends Ship {
     private Vector2 startSpeed = new Vector2(0.5f, 0);
     private float startReloadInterval = 0.4f;
     private float startBulletHeight = 0.01f;
+    private float startShotSoundVolume =0.2f;
     private int maxDamage = 5;
     private Vector2 bulletPosLeft = new Vector2(getLeft(), pos.y + getHalfHeight());
     private Vector2 bulletPosCenter = new Vector2(pos.x, pos.y + getHalfHeight());
@@ -34,6 +35,7 @@ public class Hero extends Ship {
     private boolean pressedLeft; //состояния нажатия клавиши
     private boolean pressedRight;
     private int switchBullet = 1;
+    private float shotSoundVolume = startShotSoundVolume;
 
     private int leftPointer = INVALID_POINTER;
     private int rightPointer = INVALID_POINTER;
@@ -76,7 +78,7 @@ public class Hero extends Ship {
     private void shoot(Vector2 bulletPoss) {
         Bullet bullet = bulletPool.obtain();
         bullet.set(this, bulletRegion, bulletPoss, bulletV, bulletHeight, worldBounds, damage);
-        shootSound.play(0.2f);
+        shootSound.play(shotSoundVolume);
     }
 
     @Override
@@ -264,7 +266,9 @@ public class Hero extends Ship {
     }
 
     public void switchBullet(int doubleBullet) {
-        if (this.switchBullet < 3)
+        if (this.switchBullet < 3) {
             this.switchBullet += doubleBullet;
+            shotSoundVolume = startShotSoundVolume/switchBullet;
+        }
     }
 }
