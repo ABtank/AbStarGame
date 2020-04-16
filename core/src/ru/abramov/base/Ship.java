@@ -91,7 +91,8 @@ public abstract class Ship extends Sprite {
 
     public void setV0(float v0) {
     }
-    public void setReloadInterval(float interval){
+
+    public void setReloadInterval(float interval) {
     }
 
     protected void autoShoot(float delta) {

@@ -12,9 +12,6 @@ public class ButtonNewGame extends ScaleButton {
     private GameScreen gameScreen;
 
 
-
-
-
     public ButtonNewGame(TextureAtlas atlas, GameScreen gameScreen) throws GameException {
         super(atlas.findRegion("button_new_game"));
         this.gameScreen = gameScreen;

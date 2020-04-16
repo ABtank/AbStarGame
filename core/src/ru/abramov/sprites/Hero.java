@@ -27,8 +27,8 @@ public class Hero extends Ship {
     private Vector2 bulletPosLeft = new Vector2(getLeft(), pos.y + getHalfHeight());
     private Vector2 bulletPosCenter = new Vector2(pos.x, pos.y + getHalfHeight());
     private Vector2 bulletPosRight = new Vector2(getRight(), pos.y + getHalfHeight());
-    private Vector2 [] arrBulletPos ={bulletPosLeft,bulletPosRight};
-    private Vector2 [] tripleBulletPos ={bulletPosLeft,bulletPosCenter,bulletPosRight};
+    private Vector2[] arrBulletPos = {bulletPosLeft, bulletPosRight};
+    private Vector2[] tripleBulletPos = {bulletPosLeft, bulletPosCenter, bulletPosRight};
 
 
     private boolean pressedLeft; //состояния нажатия клавиши
@@ -63,11 +63,11 @@ public class Hero extends Ship {
         setBottom(worldBounds.getBottom() + BOTTOM_MARGIN);
     }
 
-    protected void autoShoot(float delta, Vector2 [] arrBulletPoss) {
+    protected void autoShoot(float delta, Vector2[] arrBulletPoss) {
         reloadTimer += delta;
         if (reloadTimer >= reloadInterval) {
-                reloadTimer = 0f;
-            for (int i=0; i<arrBulletPoss.length; i++){
+            reloadTimer = 0f;
+            for (int i = 0; i < arrBulletPoss.length; i++) {
                 shoot(arrBulletPoss[i]);
             }
         }
@@ -82,21 +82,21 @@ public class Hero extends Ship {
     @Override
     public void update(float delta) {
         super.update(delta);
-        switch (switchBullet){
+        switch (switchBullet) {
             case 1:
                 bulletPos.set(pos.x, pos.y + getHalfHeight());
                 autoShoot(delta);
                 break;
             case 2:
-                bulletPosLeft.set(getLeft()+BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight()-BOTTOM_MARGIN);
-                bulletPosRight.set(getRight()-BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight()-BOTTOM_MARGIN);
-                autoShoot(delta,arrBulletPos);
+                bulletPosLeft.set(getLeft() + BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight() - BOTTOM_MARGIN);
+                bulletPosRight.set(getRight() - BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight() - BOTTOM_MARGIN);
+                autoShoot(delta, arrBulletPos);
                 break;
             case 3:
-                bulletPosLeft.set(getLeft()+BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight()-BOTTOM_MARGIN);
-                bulletPosRight.set(getRight()-BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight()-BOTTOM_MARGIN);
+                bulletPosLeft.set(getLeft() + BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight() - BOTTOM_MARGIN);
+                bulletPosRight.set(getRight() - BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight() - BOTTOM_MARGIN);
                 bulletPosCenter.set(pos.x, pos.y + getHalfHeight());
-                autoShoot(delta,tripleBulletPos);
+                autoShoot(delta, tripleBulletPos);
                 break;
         }
 
@@ -264,7 +264,7 @@ public class Hero extends Ship {
     }
 
     public void switchBullet(int doubleBullet) {
-        if(this.switchBullet < 3)
-        this.switchBullet += doubleBullet;
+        if (this.switchBullet < 3)
+            this.switchBullet += doubleBullet;
     }
 }
