@@ -133,6 +133,10 @@ public class EnemyEmitter {
         return level;
     }
 
+    public void setLevel() {
+        this.level++;
+    }
+
     public void startNewGame() {
         level=1;
         generateInterval=2f;

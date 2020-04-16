@@ -23,6 +23,8 @@ public abstract class Ship extends Sprite {
     protected TextureRegion bulletRegion;
     protected Vector2 bulletV;
     protected Vector2 bulletPos;
+    protected Vector2 bulletPosL;
+    protected Vector2 bulletPosR;
     protected float bulletHeight;
     protected int damage;
     protected Sound shootSound;

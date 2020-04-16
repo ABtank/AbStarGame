@@ -19,6 +19,7 @@ public class PerkEmitter {
     private static final int PERK_DAMAGE = 1;
     private static final float PERK_SPEED = 0.02f;
     private static final float PERK_RELOAD = 0.02f;
+    private static final int PERK_SPLIT_BULLET = 1;
     private static final int PERK_DEFAULT = 0;
     private static final Random random = new Random();
 
@@ -47,6 +48,9 @@ public class PerkEmitter {
             switch (framePerk) {
                 case 1:
                     perk.set(perks, PERK_DAMAGE, framePerk, PERK_HEIGHT);
+                    break;
+                case 3:
+                    perk.set(perks, PERK_SPLIT_BULLET, framePerk, PERK_HEIGHT);
                     break;
                 case 4:
                     perk.set(perks, PERK_HP, framePerk, PERK_HEIGHT);

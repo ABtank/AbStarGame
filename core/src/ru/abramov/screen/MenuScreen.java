@@ -101,6 +101,7 @@ public class MenuScreen extends BaseScreen {
         for (Star star : stars) {
             star.update(deltatime);
         }
+        buttonPlay.update(deltatime);
     }
 
     private void draw() {
