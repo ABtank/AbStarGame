@@ -34,7 +34,7 @@ public class Hero extends Ship {
 
     private boolean pressedLeft; //состояния нажатия клавиши
     private boolean pressedRight;
-    private int switchBullet = 1;
+    private int switchBullet = 2;
     private float shotSoundVolume = startShotSoundVolume;
 
     private int leftPointer = INVALID_POINTER;
@@ -65,21 +65,7 @@ public class Hero extends Ship {
         setBottom(worldBounds.getBottom() + BOTTOM_MARGIN);
     }
 
-    protected void autoShoot(float delta, Vector2[] arrBulletPoss) {
-        reloadTimer += delta;
-        if (reloadTimer >= reloadInterval) {
-            reloadTimer = 0f;
-            for (int i = 0; i < arrBulletPoss.length; i++) {
-                shoot(arrBulletPoss[i]);
-            }
-        }
-    }
 
-    private void shoot(Vector2 bulletPoss) {
-        Bullet bullet = bulletPool.obtain();
-        bullet.set(this, bulletRegion, bulletPoss, bulletV, bulletHeight, worldBounds, damage);
-        shootSound.play(shotSoundVolume);
-    }
 
     @Override
     public void update(float delta) {
@@ -92,13 +78,13 @@ public class Hero extends Ship {
             case 2:
                 bulletPosLeft.set(getLeft() + BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight() - BOTTOM_MARGIN);
                 bulletPosRight.set(getRight() - BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight() - BOTTOM_MARGIN);
-                autoShoot(delta, arrBulletPos);
+                autoShoot(delta, arrBulletPos,shotSoundVolume);
                 break;
             case 3:
                 bulletPosLeft.set(getLeft() + BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight() - BOTTOM_MARGIN);
                 bulletPosRight.set(getRight() - BOTTOM_MARGIN_BULLET, pos.y + getHalfHeight() - BOTTOM_MARGIN);
                 bulletPosCenter.set(pos.x, pos.y + getHalfHeight());
-                autoShoot(delta, tripleBulletPos);
+                autoShoot(delta, tripleBulletPos, shotSoundVolume);
                 break;
         }
 
