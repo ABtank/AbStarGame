@@ -6,21 +6,21 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import ru.abramov.base.ScaleButton;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
-import ru.abramov.screen.GameScreen;
+import ru.abramov.screen.MenuGym;
 
-public class ButtonPlay extends ScaleButton {
-
+public class ButtonGym extends ScaleButton {
     private final Game game;
 
-    public ButtonPlay(TextureAtlas atlas, Game game) throws GameException {
+    public ButtonGym(TextureAtlas atlas, Game game) throws GameException {
         super(atlas.findRegion("btPlay"));
         this.game = game;
     }
 
+
     public void resize(Rect worldBounds) {
         setHeightProportion(0.15f);
-        setLeft(worldBounds.getLeft() + 0.05f);
-        setBottom(worldBounds.getBottom() + 0.05f);
+        setLeft(worldBounds.pos.x - 0.05f);
+        setTop(worldBounds.getBottom() / 2);
     }
 
     @Override
@@ -47,6 +47,6 @@ public class ButtonPlay extends ScaleButton {
 
     @Override
     public void action() {
-        game.setScreen(new GameScreen());
+        game.setScreen(new MenuGym(game));
     }
 }

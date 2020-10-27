@@ -1,20 +1,18 @@
 package ru.abramov.sprites;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 
 import ru.abramov.base.ScaleButton;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
-import ru.abramov.screen.GameScreen;
+import ru.abramov.screen.MenuGym;
 
-public class ButtonPlay extends ScaleButton {
+public class ButtonMenu extends ScaleButton {
+    MenuGym menuGym;
 
-    private final Game game;
-
-    public ButtonPlay(TextureAtlas atlas, Game game) throws GameException {
+    public ButtonMenu(TextureAtlas atlas,MenuGym menuGym) throws GameException {
         super(atlas.findRegion("btPlay"));
-        this.game = game;
+        this.menuGym = menuGym;
     }
 
     public void resize(Rect worldBounds) {
@@ -47,6 +45,6 @@ public class ButtonPlay extends ScaleButton {
 
     @Override
     public void action() {
-        game.setScreen(new GameScreen());
+        menuGym.startMenuGym();
     }
 }

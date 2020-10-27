@@ -3,14 +3,13 @@ package ru.abramov.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -331,7 +330,9 @@ public class GameScreen extends BaseScreen {
     }
 
     private void writeScoreToFile(int score) {
-        record();
+        foundRecord();
+       FileHandle file = Gdx.files.local("scoress.txt");
+        file.writeString(score + "\n", true);
         try (FileWriter out = new FileWriter("score.txt", true)) {
             out.write(score + "\n");
             out.flush();
@@ -340,8 +341,19 @@ public class GameScreen extends BaseScreen {
         }
     }
 
-    private void record() {
-        try (FileReader in = new FileReader("score.txt");
+    private void foundRecord() {
+        FileHandle file = Gdx.files.local("scoress.txt");
+        String [] text = (file.readString()).split("\n");
+        int maxx = Integer.MIN_VALUE;
+        for (int i = 0; i < text.length ; i++) {
+            if (Integer.parseInt(text[i]) > maxx) {
+                maxx = Integer.parseInt(text[i]);
+            }
+        }
+        record = maxx;
+
+
+        /*try (FileReader in = new FileReader("score.txt");
              BufferedReader br = new BufferedReader((in))) {
             String line;
             int max = Integer.MIN_VALUE;
@@ -353,7 +365,7 @@ public class GameScreen extends BaseScreen {
             record = max;
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     private void draw() {

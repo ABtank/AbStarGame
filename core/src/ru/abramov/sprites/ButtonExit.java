@@ -2,7 +2,6 @@ package ru.abramov.sprites;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Vector2;
 
 import ru.abramov.base.ScaleButton;
 import ru.abramov.exception.GameException;
@@ -16,7 +15,7 @@ public class ButtonExit extends ScaleButton {
     }
 
     public void resize(Rect worldBounds) {
-        setHeightProportion(0.2f);
+        setHeightProportion(0.1f);
         setRight(worldBounds.getRight() - 0.05f);
         setBottom(worldBounds.getBottom() + 0.05f);
     }

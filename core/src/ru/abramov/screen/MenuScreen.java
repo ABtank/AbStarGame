@@ -8,22 +8,25 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 
 import ru.abramov.base.BaseScreen;
+import ru.abramov.base.Font;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 import ru.abramov.sprites.Background;
 import ru.abramov.sprites.ButtonExit;
+import ru.abramov.sprites.ButtonGym;
 import ru.abramov.sprites.ButtonPlay;
-import ru.abramov.sprites.Logo;
 import ru.abramov.sprites.Star;
 
 public class MenuScreen extends BaseScreen {
 
     private static final int STAR_COUNT = 256;
+    private static final float FONT_SIZE = 0.06f;
+
+    private Font font;
+    private StringBuilder sbAllRounds;
+    private StringBuilder sbTime;
 
     private final Game game;
-
-    private Texture lg;
-    private Logo logo;
 
     private Texture bg;
     private Background background;
@@ -33,6 +36,7 @@ public class MenuScreen extends BaseScreen {
     private Star[] stars;
     private ButtonExit buttonExit;
     private ButtonPlay buttonPlay;
+    private ButtonGym buttonGym;
 
     public MenuScreen(Game game) {
         this.game = game;
@@ -41,9 +45,13 @@ public class MenuScreen extends BaseScreen {
     @Override
     public void show() {
         super.show();
-        lg = new Texture("menuScreen.png");
         bg = new Texture("background.jpg");
         atlas = new TextureAtlas(Gdx.files.internal("textures/menuAtlas.tpack"));
+
+        font = new Font("font/font.fnt", "font/font.png");
+        font.setSize(FONT_SIZE);
+        sbAllRounds = new StringBuilder();
+        sbTime = new StringBuilder();
         initSprites();
     }
 
@@ -56,21 +64,21 @@ public class MenuScreen extends BaseScreen {
     @Override
     public void resize(Rect worldBounds) {
         background.resize(worldBounds);
-        logo.resize(worldBounds);
-        logo.setHeightProportion(0.25f);
-        logo.setTop(0.25f);
         for (Star star : stars) {
             star.resize(worldBounds);
         }
         buttonExit.resize(worldBounds);
         buttonPlay.resize(worldBounds);
+        buttonGym.resize(worldBounds);
+
     }
 
     @Override
     public boolean touchDown(Vector2 touch, int pointer, int button) {
         buttonExit.touchDown(touch, pointer, button);
         buttonPlay.touchDown(touch, pointer, button);
-//        logo.touchDown(touch, pointer, button);
+        buttonGym.touchDown(touch, pointer, button);
+
         return false;
     }
 
@@ -78,6 +86,8 @@ public class MenuScreen extends BaseScreen {
     public boolean touchUp(Vector2 touch, int pointer, int button) {
         buttonExit.touchUp(touch, pointer, button);
         buttonPlay.touchUp(touch, pointer, button);
+        buttonGym.touchUp(touch, pointer, button);
+
         return false;
     }
 
@@ -88,9 +98,10 @@ public class MenuScreen extends BaseScreen {
             for (int i = 0; i < STAR_COUNT; i++) {
                 stars[i] = new Star(atlas);
             }
-            logo = new Logo(lg);
             buttonExit = new ButtonExit(atlas);
             buttonPlay = new ButtonPlay(atlas, game);
+            buttonGym = new ButtonGym(atlas, game);
+
         } catch (GameException e) {
             throw new RuntimeException(e);
         }
@@ -102,7 +113,10 @@ public class MenuScreen extends BaseScreen {
             star.update(deltatime);
         }
         buttonPlay.update(deltatime);
+        buttonGym.update(deltatime);
+
     }
+
 
     private void draw() {
         Gdx.gl.glClearColor(0.5f, 0.7f, 0.8f, 0.5f);
@@ -112,18 +126,19 @@ public class MenuScreen extends BaseScreen {
         for (Star star : stars) {
             star.draw(batch);
         }
-        logo.draw(batch);
         buttonExit.draw(batch);
         buttonPlay.draw(batch);
+        buttonGym.draw(batch);
+
         batch.end();
     }
 
     @Override
     public void dispose() {
         batch.dispose();
-        lg.dispose();
         bg.dispose();
         atlas.dispose();
+
         super.dispose();
     }
 }

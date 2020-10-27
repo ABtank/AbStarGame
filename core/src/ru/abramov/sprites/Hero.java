@@ -34,7 +34,7 @@ public class Hero extends Ship {
 
     private boolean pressedLeft; //состояния нажатия клавиши
     private boolean pressedRight;
-    private int switchBullet = 2;
+    private int switchBullet = 1;
     private float shotSoundVolume = startShotSoundVolume;
 
     private int leftPointer = INVALID_POINTER;
