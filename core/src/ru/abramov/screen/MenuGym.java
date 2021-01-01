@@ -14,6 +14,8 @@ import ru.abramov.base.Font;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 import ru.abramov.sprites.Background;
+import ru.abramov.sprites.ButtonCountSetAdd;
+import ru.abramov.sprites.ButtonCountSetSub;
 import ru.abramov.sprites.ButtonExit;
 import ru.abramov.sprites.ButtonMenu;
 import ru.abramov.sprites.ButtonRoundAdd;
@@ -30,6 +32,8 @@ public class MenuGym extends BaseScreen {
     private ButtonMenu buttonMenu;
     private ButtonExit buttonExit;
 
+    private ButtonCountSetAdd buttonCountSetAdd;
+    private ButtonCountSetSub buttonCountSetSub;
     private ButtonRoundAdd buttonRoundAdd;
     private ButtonRoundSub buttonRoundSub;
     private ButtonTimeAdd buttonTimeAdd;
@@ -56,6 +60,7 @@ public class MenuGym extends BaseScreen {
     private static int allRound;
     private static int flagsound;
     private static int setEndTrain;
+    private static int setCountSet;
 
     private Texture bg;
     private Background background;
@@ -78,6 +83,7 @@ public class MenuGym extends BaseScreen {
     private Font fontTime;
     private Font fontSet;
     private StringBuilder sbSet;
+    private StringBuilder sbCountSet;
     private StringBuilder sbAllSet;
     private StringBuilder sbTime;
     private StringBuilder sbCountdownTime;
@@ -91,6 +97,13 @@ public class MenuGym extends BaseScreen {
     public void setEndTrain(int setEndTrain) {
         if (MenuGym.setEndTrain > 1 && setEndTrain < 0 || setEndTrain > 0) {
             MenuGym.setEndTrain += setEndTrain;
+        }
+    }
+
+    public void setCountSet(int setCountSet) {
+        if (MenuGym.setCountSet > 1 && setCountSet < 0 || setCountSet > 0) {
+            MenuGym.setCountSet += setCountSet;
+            MenuGym.setEndTrain = MenuGym.setCountSet * 3;
         }
     }
 
@@ -115,6 +128,7 @@ public class MenuGym extends BaseScreen {
         fontReady.setSize(FONT_SIZE*0.5f);
         sbTime = new StringBuilder();
         sbSet = new StringBuilder();
+        sbCountSet = new StringBuilder();
         sbAllSet = new StringBuilder();
         sbCountdownTime = new StringBuilder();
         initSprites();
@@ -123,6 +137,7 @@ public class MenuGym extends BaseScreen {
         round = 0;
         allRound = round;
         setEndTrain = 18;
+        setCountSet = 6;
         roundTime = 10;
         flagsound = 0;
     }
@@ -147,6 +162,8 @@ public class MenuGym extends BaseScreen {
         }
         buttonMenu.resize(worldBounds);
         buttonExit.resize(worldBounds);
+        buttonCountSetAdd.resize(worldBounds);
+        buttonCountSetSub.resize(worldBounds);
         buttonRoundAdd.resize(worldBounds);
         buttonRoundSub.resize(worldBounds);
         buttonTimeAdd.resize(worldBounds);
@@ -175,6 +192,8 @@ public class MenuGym extends BaseScreen {
         if (state == MenuGym.State.PLAYING) {
         } else if (state == MenuGym.State.GAME_OVER || state == MenuGym.State.WIN) {
             buttonExit.touchDown(touch, pointer, button);
+            buttonCountSetAdd.touchDown(touch, pointer, button);
+            buttonCountSetSub.touchDown(touch, pointer, button);
             buttonRoundAdd.touchDown(touch, pointer, button);
             buttonRoundSub.touchDown(touch, pointer, button);
             buttonTimeSub.touchDown(touch, pointer, button);
@@ -190,6 +209,8 @@ public class MenuGym extends BaseScreen {
             return super.touchUp(touch, pointer, button);
         } else if (state == MenuGym.State.GAME_OVER || state == MenuGym.State.WIN) {
             buttonExit.touchUp(touch, pointer, button);
+            buttonCountSetAdd.touchUp(touch, pointer, button);
+            buttonCountSetSub.touchUp(touch, pointer, button);
             buttonRoundAdd.touchUp(touch, pointer, button);
             buttonRoundSub.touchUp(touch, pointer, button);
             buttonTimeAdd.touchUp(touch, pointer, button);
@@ -208,6 +229,8 @@ public class MenuGym extends BaseScreen {
             for (int i = 0; i < STAR_COUNT; i++) {
                 stars[i] = new Star(atlas);
             }
+            buttonCountSetAdd = new ButtonCountSetAdd(atlasArrow, this);
+            buttonCountSetSub = new ButtonCountSetSub(atlasArrow, this);
             buttonRoundAdd = new ButtonRoundAdd(atlasArrow, this);
             buttonRoundSub = new ButtonRoundSub(atlasArrow, this);
             buttonTimeAdd = new ButtonTimeAdd(atlasArrow, this);
@@ -228,6 +251,8 @@ public class MenuGym extends BaseScreen {
             playCountdown();
         } else if (state == MenuGym.State.GAME_OVER || state == MenuGym.State.WIN) {
             // buttonNewGame.update(deltatime);
+            buttonCountSetAdd.update(deltatime);
+            buttonCountSetSub.update(deltatime);
             buttonRoundAdd.update(deltatime);
             buttonRoundSub.update(deltatime);
             buttonTimeAdd.update(deltatime);
@@ -258,6 +283,8 @@ public class MenuGym extends BaseScreen {
                 break;
             case GAME_OVER:
                 buttonExit.draw(batch);
+                buttonCountSetAdd.draw(batch);
+                buttonCountSetSub.draw(batch);
                 buttonRoundAdd.draw(batch);
                 buttonRoundSub.draw(batch);
                 buttonTimeAdd.draw(batch);
@@ -296,13 +323,14 @@ public class MenuGym extends BaseScreen {
         }else{
             fontReady.draw(batch, sbCountdownTime.append(GET_READY), worldBounds.pos.x, worldBounds.getTop() - FONT_MARGIN*10, Align.center);
         }
-        font.draw(batch, sbSet.append(SET).append(round), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y, Align.center);
+        font.draw(batch, sbSet.append(SET).append(round).append("/").append(setCountSet), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y, Align.center);
         font.draw(batch, sbAllSet.append(ALL_SET).append(allRound).append("/").append(setEndTrain), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y - FONT_MARGIN * 14, Align.center);
     }
 
     private void printSet() {
         sbTime.setLength(0);
         sbSet.setLength(0);
+        sbCountSet.setLength(0);
         sbAllSet.setLength(0);
         int min = ((int) setRoundTime) / 60;
         int sec = ((int) setRoundTime) % 60;
@@ -315,7 +343,8 @@ public class MenuGym extends BaseScreen {
         } else {
             fontSet.draw(batch, sbTime.append(min).append(":").append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 3 + FONT_MARGIN, Align.center);
         }
-        fontSet.draw(batch, sbAllSet.append(setEndTrain), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y - FONT_MARGIN*3, Align.center);
+        fontSet.draw(batch, sbAllSet.append(setEndTrain), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y - FONT_MARGIN*16, Align.center);
+        fontSet.draw(batch, sbCountSet.append(setCountSet), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y + FONT_MARGIN, Align.center);
     }
 
     private void startRound() {
@@ -326,7 +355,7 @@ public class MenuGym extends BaseScreen {
     }
 
     private void playCountdown() {
-        if (roundTime - 6 <= 0 && flagsound == 0) {
+        if (roundTime - setCountSet <= 0 && flagsound == 0) {
             soundCountdownTime.play();
             flagsound = 1;
         } else if (roundTime - 1 <= 0 && flagsound == 1) {
@@ -339,10 +368,10 @@ public class MenuGym extends BaseScreen {
         flagsound = 0;
         round++;
         allRound++;
-        if (round == 4) {
+        if (round == (setCountSet-1)) {
             soundAreYouReady.play();
         }
-        if (round == 6) {
+        if (round == setCountSet) {
             soundEndSet.play();
             round = 0;
         }

@@ -19,7 +19,7 @@ public class ButtonRoundAdd extends ScaleButton {
     public void resize(Rect worldBounds) {
         setHeightProportion(0.1f);
         setRight(worldBounds.pos.x + 0.2f);
-        setBottom(worldBounds.pos.y - 0.1f);
+        setBottom(worldBounds.pos.y - 0.23f);
     }
 
     @Override

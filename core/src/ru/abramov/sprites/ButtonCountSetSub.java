@@ -7,10 +7,10 @@ import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 import ru.abramov.screen.MenuGym;
 
-public class ButtonRoundSub extends ScaleButton {
+public class ButtonCountSetSub extends ScaleButton {
 MenuGym menuGym;
 
-    public ButtonRoundSub(TextureAtlas atlas, MenuGym menuGym) throws GameException {
+    public ButtonCountSetSub(TextureAtlas atlas, MenuGym menuGym) throws GameException {
         super(atlas.findRegion("left"));
         this.menuGym = menuGym;
     }
@@ -18,11 +18,11 @@ MenuGym menuGym;
     public void resize(Rect worldBounds) {
         setHeightProportion(0.1f);
         setRight(worldBounds.pos.x - 0.12f);
-        setBottom(worldBounds.pos.y - 0.23f);
+        setBottom(worldBounds.pos.y - 0.06f);
     }
 
     @Override
     public void action() {
-        menuGym.setEndTrain(-1);
+        menuGym.setCountSet(-1);
     }
 }

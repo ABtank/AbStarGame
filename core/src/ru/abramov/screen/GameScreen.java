@@ -49,11 +49,11 @@ public class GameScreen extends BaseScreen {
     private static final String RESULT_SCORE = "You score: ";
     private static final String RECORD = "Record: ";
     private static final String HP = "HP: ";
-    private static final String LEVEL = "Level: ";
-    private static final String FRAGS = "Frags: ";
-    private static final String DAMAGE = "Damage: ";
-    private static final String SPEED = "Speed: ";
-    private static final String RELOAD = "Reload: ";
+    private static final String LEVEL = "Lvl: ";
+    private static final String FRAGS = "Frgs: ";
+    private static final String DAMAGE = "Dmg: ";
+    private static final String SPEED = "Spd: ";
+    private static final String RELOAD = "Rld: ";
 
     private Hero hero;
 
@@ -416,8 +416,8 @@ public class GameScreen extends BaseScreen {
         font.draw(batch, sbLevel.append(LEVEL).append(enemyEmitter.getLevel()), worldBounds.getRight() - FONT_MARGIN, worldBounds.getTop() - FONT_MARGIN, Align.right);
         font.draw(batch, sbHP.append(HP).append(hero.getHp()), worldBounds.pos.x, worldBounds.getTop() - FONT_MARGIN, Align.center);
         font.draw(batch, sbDamage.append(DAMAGE).append(hero.getDamage()), worldBounds.getRight() - FONT_MARGIN, worldBounds.getBottom() + FONT_MARGIN * 3, Align.right);
-        font.draw(batch, sbSpeed.append(SPEED).append(hero.getSpeed()), worldBounds.pos.x - 0.15f, worldBounds.getBottom() + FONT_MARGIN * 3);
-        font.draw(batch, sbReload.append(RELOAD).append(hero.getReload()), worldBounds.pos.x, worldBounds.getBottom() + FONT_MARGIN * 3);
+        font.draw(batch, sbSpeed.append(SPEED).append(hero.getSpeed()), worldBounds.pos.x - 0.10f, worldBounds.getBottom() + FONT_MARGIN * 3);
+        font.draw(batch, sbReload.append(RELOAD).append(hero.getReload()), worldBounds.pos.x + 0.03f, worldBounds.getBottom() + FONT_MARGIN * 3);
         if (state == State.GAME_OVER || state == State.WIN) {
             if (score > record) {
                 font.draw(batch, sbRecord.append("THIS NEW ").append(RECORD).append(score), worldBounds.pos.x, worldBounds.pos.y + 0.1f, Align.center);
