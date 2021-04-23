@@ -9,6 +9,10 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Align;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import ru.abramov.base.BaseScreen;
@@ -43,6 +47,8 @@ public class GameScreen extends BaseScreen {
     private static final float FONT_MARGIN = 0.01f;
     private static final float FONT_SIZE = 0.02f;
     private static final String SCORE = "Score: ";
+    private static final String RESULT_SCORE = "You score: ";
+    private static final String RECORD = "Record: ";
     private static final String HP = "HP: ";
     private static final String LEVEL = "Level: ";
     private static final String FRAGS = "Frags: ";
@@ -82,13 +88,16 @@ public class GameScreen extends BaseScreen {
     private StringBuilder sbHP;
     private StringBuilder sbLevel;
     private StringBuilder sbScore;
+    private StringBuilder sbResultScore;
+    private StringBuilder sbRecord;
     private StringBuilder sbDamage;
     private StringBuilder sbSpeed;
     private StringBuilder sbReload;
 
     private int frags;
     private int score;
-    private int win = 10000;
+    private int record;
+    private int win = 3000;
 
     @Override
     public void show() {
@@ -115,6 +124,8 @@ public class GameScreen extends BaseScreen {
         sbDamage = new StringBuilder();
         sbSpeed = new StringBuilder();
         sbReload = new StringBuilder();
+        sbRecord = new StringBuilder();
+        sbResultScore = new StringBuilder();
         music = Gdx.audio.newMusic(Gdx.files.internal("sounds/song.mp3"));
         music.setLooping(true);
         music.setVolume(0.1f);
@@ -226,8 +237,8 @@ public class GameScreen extends BaseScreen {
             return;
         }
         if (frags % 10 == 0) {
-            enemyEmitter.setGenerateInterval(0.2f);
             frags++;
+            enemyEmitter.setGenerateInterval(0.2f);
         }
         List<Enemy> enemyList = enemyPool.getActiveObjects();
         List<Bullet> bulletList = bulletPool.getActiveObjects();
@@ -243,7 +254,7 @@ public class GameScreen extends BaseScreen {
                 frags++;
                 score += enemy.getDamage();
                 perkEmitter.generate(enemy);
-                if (score == win || enemyEmitter.getGenerateInterval() <= 0) {
+                if (enemyEmitter.getLevel() > win) {
                     state = State.WIN;
                 }
                 hero.damage(enemy.getDamage());
@@ -259,7 +270,7 @@ public class GameScreen extends BaseScreen {
                         frags++;
                         score += enemy.getDamage();
                         perkEmitter.generate(enemy);
-                        if (score == win || enemyEmitter.getGenerateInterval() <= 0) {
+                        if (enemyEmitter.getLevel() > win) {
                             state = State.WIN;
                         }
                     }
@@ -290,6 +301,9 @@ public class GameScreen extends BaseScreen {
                     case 1:
                         hero.setDamage(perk.bonus);
                         break;
+                    case 3:
+                        hero.switchBullet(perk.bonus);
+                        break;
                     case 4:
                         hero.setHp(perk.bonus);
                         break;
@@ -298,9 +312,14 @@ public class GameScreen extends BaseScreen {
                         break;
                     case 7:
                         hero.setReloadInterval(perk.fbonus);
+                        break;
                 }
                 perk.destroy();
             }
+        }
+        if (state == State.GAME_OVER || state == State.WIN) {
+            writeScoreToFile(score);
+            return;
         }
     }
 
@@ -309,6 +328,32 @@ public class GameScreen extends BaseScreen {
         enemyPool.freeAllDestroyedActiveObjects();
         explosionPool.freeAllDestroyedActiveObjects();
         perkPool.freeAllDestroyedActiveObjects();
+    }
+
+    private void writeScoreToFile(int score) {
+        record();
+        try (FileWriter out = new FileWriter("score.txt", true)) {
+            out.write(score + "\n");
+            out.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void record() {
+        try (FileReader in = new FileReader("score.txt");
+             BufferedReader br = new BufferedReader((in))) {
+            String line;
+            int max = Integer.MIN_VALUE;
+            while ((line = br.readLine()) != null) {
+                if (Integer.parseInt(line) > max) {
+                    max = Integer.parseInt(line);
+                }
+            }
+            record = max;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void draw() {
@@ -346,6 +391,8 @@ public class GameScreen extends BaseScreen {
 
     private void printInfo() {
         sbScore.setLength(0);
+        sbResultScore.setLength(0);
+        sbRecord.setLength(0);
         sbFrags.setLength(0);
         sbLevel.setLength(0);
         sbHP.setLength(0);
@@ -357,8 +404,17 @@ public class GameScreen extends BaseScreen {
         font.draw(batch, sbLevel.append(LEVEL).append(enemyEmitter.getLevel()), worldBounds.getRight() - FONT_MARGIN, worldBounds.getTop() - FONT_MARGIN, Align.right);
         font.draw(batch, sbHP.append(HP).append(hero.getHp()), worldBounds.pos.x, worldBounds.getTop() - FONT_MARGIN, Align.center);
         font.draw(batch, sbDamage.append(DAMAGE).append(hero.getDamage()), worldBounds.getRight() - FONT_MARGIN, worldBounds.getBottom() + FONT_MARGIN * 3, Align.right);
-        font.draw(batch, sbSpeed.append(SPEED).append(hero.getSpeed()), worldBounds.pos.x-0.15f, worldBounds.getBottom() + FONT_MARGIN * 3);
+        font.draw(batch, sbSpeed.append(SPEED).append(hero.getSpeed()), worldBounds.pos.x - 0.15f, worldBounds.getBottom() + FONT_MARGIN * 3);
         font.draw(batch, sbReload.append(RELOAD).append(hero.getReload()), worldBounds.pos.x, worldBounds.getBottom() + FONT_MARGIN * 3);
+        if (state == State.GAME_OVER || state == State.WIN) {
+            if (score > record) {
+                font.draw(batch, sbRecord.append("THIS NEW ").append(RECORD).append(score), worldBounds.pos.x, worldBounds.pos.y + 0.1f, Align.center);
+            } else {
+                font.draw(batch, sbResultScore.append(RESULT_SCORE).append(score), worldBounds.pos.x, worldBounds.pos.y + 0.15f, Align.center);
+                font.draw(batch, sbRecord.append(RECORD).append(record), worldBounds.pos.x, worldBounds.pos.y + 0.1f, Align.center);
+            }
+        }
+
     }
 
     public void startNewGameScreen() {

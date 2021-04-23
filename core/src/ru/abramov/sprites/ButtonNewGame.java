@@ -11,12 +11,6 @@ public class ButtonNewGame extends ScaleButton {
 
     private GameScreen gameScreen;
 
-    private static final float MAX_SCALE = 1.05f;
-    private static final float MIN_SCALE = 1f;
-    private static final float ANIMATE_INTERVAL = 0.05f;
-
-    private boolean isGrow;
-    private float animateTimer;
 
     public ButtonNewGame(TextureAtlas atlas, GameScreen gameScreen) throws GameException {
         super(atlas.findRegion("button_new_game"));

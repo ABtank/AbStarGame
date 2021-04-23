@@ -2,7 +2,6 @@ package ru.abramov.sprites;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Vector2;
 
 import ru.abramov.base.ScaleButton;
 import ru.abramov.exception.GameException;
@@ -22,6 +21,28 @@ public class ButtonPlay extends ScaleButton {
         setHeightProportion(0.25f);
         setLeft(worldBounds.getLeft() + 0.05f);
         setBottom(worldBounds.getBottom() + 0.05f);
+    }
+
+    @Override
+    public void update(float delta) {
+        animateTimer += delta;
+        if (animateTimer < ANIMATE_INTERVAL) {
+            return;
+        }
+        animateTimer = 0f;
+        if (isGrow) {
+            scale += delta;
+            if (scale >= MAX_SCALE) {
+                scale = MAX_SCALE;
+                isGrow = false;
+            }
+        } else {
+            scale -= delta;
+            if (scale <= MIN_SCALE) {
+                scale = MIN_SCALE;
+                isGrow = true;
+            }
+        }
     }
 
     @Override

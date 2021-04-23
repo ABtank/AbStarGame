@@ -10,6 +10,11 @@ public abstract class ScaleButton extends Sprite {
     private static final float SCALE = 0.9f;
     private int pointer; //номер пальца
     private boolean pressed; // состояние кнопки
+    protected static final float MAX_SCALE = 1.05f;
+    protected static final float MIN_SCALE = 1f;
+    protected static final float ANIMATE_INTERVAL = 0.05f;
+    protected boolean isGrow;
+    protected float animateTimer;
 
     public ScaleButton(TextureRegion region) throws GameException {
         super(region);
