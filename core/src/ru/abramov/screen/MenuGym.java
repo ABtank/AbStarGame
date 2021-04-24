@@ -14,6 +14,8 @@ import ru.abramov.base.Font;
 import ru.abramov.exception.GameException;
 import ru.abramov.math.Rect;
 import ru.abramov.sprites.Background;
+import ru.abramov.sprites.ButtonCountExerciseAdd;
+import ru.abramov.sprites.ButtonCountExerciseSub;
 import ru.abramov.sprites.ButtonCountSetAdd;
 import ru.abramov.sprites.ButtonCountSetSub;
 import ru.abramov.sprites.ButtonExit;
@@ -34,6 +36,8 @@ public class MenuGym extends BaseScreen {
 
     private ButtonCountSetAdd buttonCountSetAdd;
     private ButtonCountSetSub buttonCountSetSub;
+    private ButtonCountExerciseAdd buttonCountExerciseAdd;
+    private ButtonCountExerciseSub buttonCountExerciseSub;
     private ButtonRoundAdd buttonRoundAdd;
     private ButtonRoundSub buttonRoundSub;
     private ButtonTimeAdd buttonTimeAdd;
@@ -48,19 +52,20 @@ public class MenuGym extends BaseScreen {
     private static final int STAR_COUNT = 264;
     private static final float FONT_MARGIN = 0.01f;
     private static final float FONT_SIZE = 0.1f;
-    private static final float FONT_SIZE_TIME = 0.14f;
-    private static final float FONT_SIZE_SET = 0.04f;
     private static final String SET = "Set: ";
+    private static final String EX = "Ex.: ";
     private static final String ALL_SET = "All: ";
     private static final String GET_READY = "GET READY !";
     private static float setRoundTime = 120f;
     private static float countdownTime;
     private static float roundTime;
     private static int round;
+    private static int exercise;
     private static int allRound;
     private static int flagsound;
     private static int setEndTrain;
     private static int setCountSet;
+    private static int setExerciseSet;
 
     private Texture bg;
     private Background background;
@@ -79,11 +84,14 @@ public class MenuGym extends BaseScreen {
     private MenuGym.State prevState;
 
     private Font font;
+    private Font fontInfo;
     private Font fontReady;
     private Font fontTime;
     private Font fontSet;
     private StringBuilder sbSet;
+    private StringBuilder sbEx;
     private StringBuilder sbCountSet;
+    private StringBuilder sbExerciseSet;
     private StringBuilder sbAllSet;
     private StringBuilder sbTime;
     private StringBuilder sbCountdownTime;
@@ -103,7 +111,13 @@ public class MenuGym extends BaseScreen {
     public void setCountSet(int setCountSet) {
         if (MenuGym.setCountSet > 1 && setCountSet < 0 || setCountSet > 0) {
             MenuGym.setCountSet += setCountSet;
-            MenuGym.setEndTrain = MenuGym.setCountSet * 3;
+            MenuGym.setEndTrain = MenuGym.setCountSet * MenuGym.setExerciseSet;
+        }
+    }
+    public void setExerciseSet(int setExerciseSet) {
+        if (MenuGym.setExerciseSet > 1 && setExerciseSet < 0 || setExerciseSet > 0) {
+            MenuGym.setExerciseSet += setExerciseSet;
+            MenuGym.setEndTrain = MenuGym.setCountSet * MenuGym.setExerciseSet;
         }
     }
 
@@ -118,26 +132,32 @@ public class MenuGym extends BaseScreen {
         soundAreYouReady = Gdx.audio.newSound(Gdx.files.internal("sounds/holy_shit_unreal_tournamen.mp3"));
         lg = new Texture("menuScreen.png");
         atlasArrow = new TextureAtlas((Gdx.files.internal("textures/arrow/BlackArrows.pack")));
+        fontInfo = new Font("font/font.fnt", "font/font.png");
         font = new Font("font/font.fnt", "font/font.png");
         fontTime = new Font("font/font.fnt", "font/font.png");
         fontSet = new Font("font/font.fnt", "font/font.png");
         fontReady = new Font("font/font.fnt", "font/font.png");
-        font.setSize(FONT_SIZE*0.8f);
-        fontTime.setSize(FONT_SIZE_TIME);
-        fontSet.setSize(FONT_SIZE_SET);
-        fontReady.setSize(FONT_SIZE*0.5f);
+        font.setSize(FONT_SIZE * 0.8f);
+        fontInfo.setSize(FONT_SIZE * 0.2f);
+        fontTime.setSize(FONT_SIZE * 1.4f);
+        fontSet.setSize(FONT_SIZE * 0.4f);
+        fontReady.setSize(FONT_SIZE * 0.5f);
         sbTime = new StringBuilder();
         sbSet = new StringBuilder();
+        sbEx = new StringBuilder();
         sbCountSet = new StringBuilder();
+        sbExerciseSet = new StringBuilder();
         sbAllSet = new StringBuilder();
         sbCountdownTime = new StringBuilder();
         initSprites();
         state = State.GAME_OVER;
         prevState = MenuGym.State.PLAYING;
         round = 0;
+        exercise = 0;
         allRound = round;
-        setEndTrain = 18;
         setCountSet = 6;
+        setExerciseSet = 3;
+        setEndTrain = setCountSet*setExerciseSet;
         roundTime = 10;
         flagsound = 0;
     }
@@ -164,6 +184,8 @@ public class MenuGym extends BaseScreen {
         buttonExit.resize(worldBounds);
         buttonCountSetAdd.resize(worldBounds);
         buttonCountSetSub.resize(worldBounds);
+        buttonCountExerciseAdd.resize(worldBounds);
+        buttonCountExerciseSub.resize(worldBounds);
         buttonRoundAdd.resize(worldBounds);
         buttonRoundSub.resize(worldBounds);
         buttonTimeAdd.resize(worldBounds);
@@ -194,8 +216,10 @@ public class MenuGym extends BaseScreen {
             buttonExit.touchDown(touch, pointer, button);
             buttonCountSetAdd.touchDown(touch, pointer, button);
             buttonCountSetSub.touchDown(touch, pointer, button);
-            buttonRoundAdd.touchDown(touch, pointer, button);
-            buttonRoundSub.touchDown(touch, pointer, button);
+            buttonCountExerciseAdd.touchDown(touch, pointer, button);
+            buttonCountExerciseSub.touchDown(touch, pointer, button);
+//            buttonRoundAdd.touchDown(touch, pointer, button);
+//            buttonRoundSub.touchDown(touch, pointer, button);
             buttonTimeSub.touchDown(touch, pointer, button);
             buttonTimeAdd.touchDown(touch, pointer, button);
         }
@@ -211,8 +235,10 @@ public class MenuGym extends BaseScreen {
             buttonExit.touchUp(touch, pointer, button);
             buttonCountSetAdd.touchUp(touch, pointer, button);
             buttonCountSetSub.touchUp(touch, pointer, button);
-            buttonRoundAdd.touchUp(touch, pointer, button);
-            buttonRoundSub.touchUp(touch, pointer, button);
+            buttonCountExerciseAdd.touchUp(touch, pointer, button);
+            buttonCountExerciseSub.touchUp(touch, pointer, button);
+//            buttonRoundAdd.touchUp(touch, pointer, button);
+//            buttonRoundSub.touchUp(touch, pointer, button);
             buttonTimeAdd.touchUp(touch, pointer, button);
             buttonTimeSub.touchUp(touch, pointer, button);
         }
@@ -231,6 +257,8 @@ public class MenuGym extends BaseScreen {
             }
             buttonCountSetAdd = new ButtonCountSetAdd(atlasArrow, this);
             buttonCountSetSub = new ButtonCountSetSub(atlasArrow, this);
+            buttonCountExerciseAdd = new ButtonCountExerciseAdd(atlasArrow, this);
+            buttonCountExerciseSub = new ButtonCountExerciseSub(atlasArrow, this);
             buttonRoundAdd = new ButtonRoundAdd(atlasArrow, this);
             buttonRoundSub = new ButtonRoundSub(atlasArrow, this);
             buttonTimeAdd = new ButtonTimeAdd(atlasArrow, this);
@@ -253,6 +281,8 @@ public class MenuGym extends BaseScreen {
             // buttonNewGame.update(deltatime);
             buttonCountSetAdd.update(deltatime);
             buttonCountSetSub.update(deltatime);
+            buttonCountExerciseAdd.update(deltatime);
+            buttonCountExerciseSub.update(deltatime);
             buttonRoundAdd.update(deltatime);
             buttonRoundSub.update(deltatime);
             buttonTimeAdd.update(deltatime);
@@ -285,8 +315,10 @@ public class MenuGym extends BaseScreen {
                 buttonExit.draw(batch);
                 buttonCountSetAdd.draw(batch);
                 buttonCountSetSub.draw(batch);
-                buttonRoundAdd.draw(batch);
-                buttonRoundSub.draw(batch);
+                buttonCountExerciseAdd.draw(batch);
+                buttonCountExerciseSub.draw(batch);
+//                buttonRoundAdd.draw(batch);
+//                buttonRoundSub.draw(batch);
                 buttonTimeAdd.draw(batch);
                 buttonTimeSub.draw(batch);
                 printSet();
@@ -303,48 +335,55 @@ public class MenuGym extends BaseScreen {
     private void printInfo() {
         sbTime.setLength(0);
         sbSet.setLength(0);
+        sbEx.setLength(0);
         sbAllSet.setLength(0);
         sbCountdownTime.setLength(0);
+        float d = 2.0f;
         int min = ((int) roundTime) / 60;
         int sec = ((int) roundTime) % 60;
         int allMin = ((int) countdownTime) / 60;
         int allSec = ((int) countdownTime) % 60;
         if (min < 10 && sec < 10) {
-            fontTime.draw(batch, sbTime.append(0).append(min).append(":").append(0).append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 2, Align.center);
+            fontTime.draw(batch, sbTime.append(0).append(min).append(":").append(0).append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / d, Align.center);
         } else if (min >= 10 && sec <= 10) {
-            fontTime.draw(batch, sbTime.append(min).append(":").append(0).append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 2, Align.center);
+            fontTime.draw(batch, sbTime.append(min).append(":").append(0).append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / d, Align.center);
         } else if (min <= 10 && sec >= 10) {
-            fontTime.draw(batch, sbTime.append(0).append(min).append(":").append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 2, Align.center);
+            fontTime.draw(batch, sbTime.append(0).append(min).append(":").append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / d, Align.center);
         } else {
-            fontTime.draw(batch, sbTime.append(min).append(":").append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 2, Align.center);
+            fontTime.draw(batch, sbTime.append(min).append(":").append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / d, Align.center);
         }
         if (allRound != 0) {
             font.draw(batch, sbCountdownTime.append(allMin).append(":").append(allSec), worldBounds.pos.x, worldBounds.getTop(), Align.center);
         }else{
             fontReady.draw(batch, sbCountdownTime.append(GET_READY), worldBounds.pos.x, worldBounds.getTop() - FONT_MARGIN*10, Align.center);
         }
-        font.draw(batch, sbSet.append(SET).append(round).append("/").append(setCountSet), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y, Align.center);
+        fontSet.draw(batch, sbEx.append(EX).append(exercise).append("/").append(setExerciseSet), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y + FONT_MARGIN * 6, Align.center);
+        font.draw(batch, sbSet.append(SET).append(round).append("/").append(setCountSet), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y - FONT_MARGIN , Align.center);
         font.draw(batch, sbAllSet.append(ALL_SET).append(allRound).append("/").append(setEndTrain), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y - FONT_MARGIN * 14, Align.center);
     }
 
     private void printSet() {
         sbTime.setLength(0);
-        sbSet.setLength(0);
         sbCountSet.setLength(0);
+        sbExerciseSet.setLength(0);
         sbAllSet.setLength(0);
         int min = ((int) setRoundTime) / 60;
         int sec = ((int) setRoundTime) % 60;
         if (min < 10 && sec < 10) {
-            fontSet.draw(batch, sbTime.append(0).append(min).append(":").append(0).append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 3 + FONT_MARGIN, Align.center);
+            fontSet.draw(batch, sbTime.append(0).append(min).append(":").append(0).append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 1.95f + FONT_MARGIN, Align.center);
         } else if (min >= 10 && sec <= 10) {
-            fontSet.draw(batch, sbTime.append(min).append(":").append(0).append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 3 + FONT_MARGIN, Align.center);
+            fontSet.draw(batch, sbTime.append(min).append(":").append(0).append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 1.95f + FONT_MARGIN, Align.center);
         } else if (min <= 10 && sec >= 10) {
-            fontSet.draw(batch, sbTime.append(0).append(min).append(":").append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 3 + FONT_MARGIN, Align.center);
+            fontSet.draw(batch, sbTime.append(0).append(min).append(":").append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 1.95f + FONT_MARGIN, Align.center);
         } else {
-            fontSet.draw(batch, sbTime.append(min).append(":").append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 3 + FONT_MARGIN, Align.center);
+            fontSet.draw(batch, sbTime.append(min).append(":").append(sec), worldBounds.pos.x - FONT_MARGIN, worldBounds.getTop() / 1.95f + FONT_MARGIN, Align.center);
         }
-        fontSet.draw(batch, sbAllSet.append(setEndTrain), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y - FONT_MARGIN*16, Align.center);
-        fontSet.draw(batch, sbCountSet.append(setCountSet), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y + FONT_MARGIN, Align.center);
+        fontInfo.draw(batch, "Round time", worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y + FONT_MARGIN * 30, Align.center);
+        fontInfo.draw(batch, "Exercise", worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y + FONT_MARGIN * 17, Align.center);
+        fontSet.draw(batch, sbExerciseSet.append(setExerciseSet), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y + FONT_MARGIN * 13, Align.center);
+        fontInfo.draw(batch, "Set", worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y + FONT_MARGIN * 4, Align.center);
+        fontSet.draw(batch, sbCountSet.append(setCountSet), worldBounds.pos.x - FONT_MARGIN, worldBounds.pos.y + FONT_MARGIN * 0.9f, Align.center);
+        fontSet.draw(batch, sbAllSet.append("Total: ").append(setEndTrain), worldBounds.pos.x - FONT_MARGIN * 3, worldBounds.pos.y - FONT_MARGIN * 16, Align.center);
     }
 
     private void startRound() {
@@ -366,6 +405,9 @@ public class MenuGym extends BaseScreen {
 
     private void roundAdd() {
         flagsound = 0;
+        if(round == 0 && exercise == 0){
+            exercise++;
+        }
         round++;
         allRound++;
         if (round == (setCountSet-1)) {
@@ -374,6 +416,7 @@ public class MenuGym extends BaseScreen {
         if (round == setCountSet) {
             soundEndSet.play();
             round = 0;
+            exercise++;
         }
         roundTime = setRoundTime;
         if (allRound == setEndTrain) {
