@@ -1,5 +1,6 @@
 package ru.abramov.screen;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -24,6 +25,7 @@ import ru.abramov.pool.ExplosionPool;
 import ru.abramov.pool.PerkPool;
 import ru.abramov.sprites.Background;
 import ru.abramov.sprites.Bullet;
+import ru.abramov.sprites.ButtonMenuScreen;
 import ru.abramov.sprites.ButtonNewGame;
 import ru.abramov.sprites.Enemy;
 import ru.abramov.sprites.GameOver;
@@ -39,6 +41,7 @@ public class GameScreen extends BaseScreen {
 
     private Texture lg;
     private Logo logo;
+    private Game game;
 
     private enum State {PLAYING, PAUSE, GAME_OVER, WIN}
 
@@ -62,10 +65,12 @@ public class GameScreen extends BaseScreen {
 
     private TextureAtlas atlas;
     private TextureAtlas perksAtlas;
+    private TextureAtlas atlasArrow;
     private Star[] stars;
     private GameOver gameOver;
     private GameWin gameWin;
     private ButtonNewGame buttonNewGame;
+    private ButtonMenuScreen buttonMenuScreen;
 
     private BulletPool bulletPool;
     private EnemyPool enemyPool;
@@ -98,12 +103,17 @@ public class GameScreen extends BaseScreen {
     private int record;
     private int win = 3000;
 
+    public GameScreen(Game game) {
+        this.game = game;
+    }
+
     @Override
     public void show() {
         super.show();
         bg = new Texture("background.jpg");
         atlas = new TextureAtlas(Gdx.files.internal("textures/mainAtlas.tpack"));
         perksAtlas = new TextureAtlas(Gdx.files.internal("textures/perks/perks.pack"));
+        atlasArrow = new TextureAtlas((Gdx.files.internal("textures/arrow/arrows.pack")));
         laserSound = Gdx.audio.newSound(Gdx.files.internal("sounds/laser.wav"));
         bulletSound = Gdx.audio.newSound(Gdx.files.internal("sounds/piu.mp3"));
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
@@ -159,6 +169,7 @@ public class GameScreen extends BaseScreen {
             star.resize(worldBounds);
         }
         buttonNewGame.resize(worldBounds);
+        buttonMenuScreen.resize(worldBounds);
     }
 
     @Override
@@ -183,6 +194,7 @@ public class GameScreen extends BaseScreen {
             hero.touchDown(touch, pointer, button);
         } else if (state == State.GAME_OVER || state == State.WIN) {
             buttonNewGame.touchDown(touch, pointer, button);
+            buttonMenuScreen.touchDown(touch, pointer, button);
         }
         return false;
     }
@@ -194,6 +206,7 @@ public class GameScreen extends BaseScreen {
             return super.touchUp(touch, pointer, button);
         } else if (state == State.GAME_OVER || state == State.WIN) {
             buttonNewGame.touchUp(touch, pointer, button);
+            buttonMenuScreen.touchUp(touch, pointer, button);
         }
         return false;
     }
@@ -206,6 +219,7 @@ public class GameScreen extends BaseScreen {
             gameOver = new GameOver(atlas);
             gameWin = new GameWin();
             buttonNewGame = new ButtonNewGame(atlas, this);
+            buttonMenuScreen = new ButtonMenuScreen(atlasArrow, game);
             for (int i = 0; i < STAR_COUNT; i++) {
                 stars[i] = new Star(atlas);
             }
@@ -228,6 +242,7 @@ public class GameScreen extends BaseScreen {
             enemyEmitter.generate(deltatime, frags);
         } else if (state == State.GAME_OVER || state == State.WIN) {
             buttonNewGame.update(deltatime);
+            buttonMenuScreen.update(deltatime);
         }
     }
 
@@ -391,11 +406,13 @@ public class GameScreen extends BaseScreen {
                 logo.draw(batch);
                 gameOver.draw(batch);
                 buttonNewGame.draw(batch);
+                buttonMenuScreen.draw(batch);
                 break;
             case WIN:
                 logo.draw(batch);
                 gameWin.draw(batch);
                 buttonNewGame.draw(batch);
+                buttonMenuScreen.draw(batch);
         }
         printInfo();
         batch.end();

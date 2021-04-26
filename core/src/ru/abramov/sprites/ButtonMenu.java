@@ -11,12 +11,12 @@ public class ButtonMenu extends ScaleButton {
     MenuGym menuGym;
 
     public ButtonMenu(TextureAtlas atlas,MenuGym menuGym) throws GameException {
-        super(atlas.findRegion("btPlay"));
+        super(atlas.findRegion("play"));
         this.menuGym = menuGym;
     }
 
     public void resize(Rect worldBounds) {
-        setHeightProportion(0.15f);
+        setHeightProportion(0.1f);
         setLeft(worldBounds.getLeft() + 0.05f);
         setBottom(worldBounds.getBottom() + 0.05f);
     }

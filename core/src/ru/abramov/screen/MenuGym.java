@@ -23,6 +23,7 @@ import ru.abramov.sprites.ButtonCountSetAdd;
 import ru.abramov.sprites.ButtonCountSetSub;
 import ru.abramov.sprites.ButtonExit;
 import ru.abramov.sprites.ButtonMenu;
+import ru.abramov.sprites.ButtonMenuScreen;
 import ru.abramov.sprites.ButtonRoundAdd;
 import ru.abramov.sprites.ButtonRoundSub;
 import ru.abramov.sprites.ButtonTimeAdd;
@@ -36,6 +37,7 @@ public class MenuGym extends BaseScreen {
     private final Game game;
     private ButtonMenu buttonMenu;
     private ButtonExit buttonExit;
+    private ButtonMenuScreen buttonMenuScreen;
 
     private ButtonCountSetAdd buttonCountSetAdd;
     private ButtonCountSetSub buttonCountSetSub;
@@ -50,7 +52,7 @@ public class MenuGym extends BaseScreen {
         this.game = game;
     }
 
-    private enum State {PLAYING, PAUSE, GAME_OVER, WIN}
+    private enum State {PLAYING, PAUSE, SETTINGS, WIN}
 
     private static final int STAR_COUNT = 264;
     private static final float FONT_MARGIN = 0.01f;
@@ -170,7 +172,7 @@ public class MenuGym extends BaseScreen {
         soundEndSet = Gdx.audio.newSound(Gdx.files.internal("sounds/yxyy.mp3"));
         soundAreYouReady = Gdx.audio.newSound(Gdx.files.internal("sounds/holy_shit_unreal_tournamen.mp3"));
         lg = new Texture("menuScreen.png");
-        atlasArrow = new TextureAtlas((Gdx.files.internal("textures/arrow/BlackArrows.pack")));
+        atlasArrow = new TextureAtlas((Gdx.files.internal("textures/arrow/arrows.pack")));
         fontInfo = new Font("font/font.fnt", "font/font.png");
         font = new Font("font/font.fnt", "font/font.png");
         fontTime = new Font("font/font.fnt", "font/font.png");
@@ -189,8 +191,8 @@ public class MenuGym extends BaseScreen {
         sbAllSet = new StringBuilder();
         sbCountdownTime = new StringBuilder();
         initSprites();
-        state = State.GAME_OVER;
-        prevState = MenuGym.State.PLAYING;
+        state = State.SETTINGS;
+        prevState = State.PAUSE;
         round = 0;
         exercise = 0;
         allRound = round;
@@ -220,6 +222,7 @@ public class MenuGym extends BaseScreen {
         }
         buttonMenu.resize(worldBounds);
         buttonExit.resize(worldBounds);
+        buttonMenuScreen.resize(worldBounds);
         buttonCountSetAdd.resize(worldBounds);
         buttonCountSetSub.resize(worldBounds);
         buttonCountExerciseAdd.resize(worldBounds);
@@ -250,8 +253,9 @@ public class MenuGym extends BaseScreen {
     public boolean touchDown(Vector2 touch, int pointer, int button) {
         buttonMenu.touchDown(touch, pointer, button);
         if (state == MenuGym.State.PLAYING) {
-        } else if (state == MenuGym.State.GAME_OVER || state == MenuGym.State.WIN) {
+        } else if (state == MenuGym.State.SETTINGS || state == MenuGym.State.WIN) {
             buttonExit.touchDown(touch, pointer, button);
+            buttonMenuScreen.touchDown(touch, pointer, button);
             buttonCountSetAdd.touchDown(touch, pointer, button);
             buttonCountSetSub.touchDown(touch, pointer, button);
             buttonCountExerciseAdd.touchDown(touch, pointer, button);
@@ -269,8 +273,9 @@ public class MenuGym extends BaseScreen {
         buttonMenu.touchUp(touch, pointer, button);
         if (state == MenuGym.State.PLAYING) {
             return super.touchUp(touch, pointer, button);
-        } else if (state == MenuGym.State.GAME_OVER || state == MenuGym.State.WIN) {
+        } else if (state == MenuGym.State.SETTINGS || state == MenuGym.State.WIN) {
             buttonExit.touchUp(touch, pointer, button);
+            buttonMenuScreen.touchUp(touch, pointer, button);
             buttonCountSetAdd.touchUp(touch, pointer, button);
             buttonCountSetSub.touchUp(touch, pointer, button);
             buttonCountExerciseAdd.touchUp(touch, pointer, button);
@@ -288,8 +293,9 @@ public class MenuGym extends BaseScreen {
             background = new Background(bg);
             stars = new Star[STAR_COUNT];
             logo = new Logo(lg);
-            buttonMenu = new ButtonMenu(atlas, this);
-            buttonExit = new ButtonExit(atlas);
+            buttonMenu = new ButtonMenu(atlasArrow, this);
+            buttonExit = new ButtonExit(atlasArrow);
+            buttonMenuScreen = new ButtonMenuScreen(atlasArrow, game);
             for (int i = 0; i < STAR_COUNT; i++) {
                 stars[i] = new Star(atlas);
             }
@@ -315,7 +321,7 @@ public class MenuGym extends BaseScreen {
             countdownTime -= deltatime;
             startRound();
             playCountdown();
-        } else if (state == MenuGym.State.GAME_OVER || state == MenuGym.State.WIN) {
+        } else if (state == MenuGym.State.SETTINGS || state == MenuGym.State.WIN) {
             // buttonNewGame.update(deltatime);
             buttonCountSetAdd.update(deltatime);
             buttonCountSetSub.update(deltatime);
@@ -349,8 +355,9 @@ public class MenuGym extends BaseScreen {
             case PLAYING:
                 printInfo();
                 break;
-            case GAME_OVER:
+            case SETTINGS:
                 buttonExit.draw(batch);
+                buttonMenuScreen.draw(batch);
                 buttonCountSetAdd.draw(batch);
                 buttonCountSetSub.draw(batch);
                 buttonCountExerciseAdd.draw(batch);
@@ -443,17 +450,17 @@ public class MenuGym extends BaseScreen {
         }
         roundTime = setRoundTime;
         if (allRound == setEndTrain) {
-            state = State.GAME_OVER;
+            state = State.SETTINGS;
         }
     }
 
     public void startMenuGym() {
-        if (state == State.GAME_OVER) {
+        if (state == State.SETTINGS) {
             state = MenuGym.State.PLAYING;
             countdownTime = (setEndTrain - 1) * setRoundTime + timeGetReady;
             Gdx.files.local("settings.txt").writeString(setRoundTime + " " + setExerciseSet + " " + setCountSet + "\n", false);
         } else {
-            state = State.GAME_OVER;
+            state = State.SETTINGS;
         }
         round = 0;
         allRound = round;

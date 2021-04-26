@@ -32,6 +32,7 @@ public class MenuScreen extends BaseScreen {
     private Background background;
 
     private TextureAtlas atlas;
+    private TextureAtlas atlasArrow;
 
     private Star[] stars;
     private ButtonExit buttonExit;
@@ -47,7 +48,7 @@ public class MenuScreen extends BaseScreen {
         super.show();
         bg = new Texture("background.jpg");
         atlas = new TextureAtlas(Gdx.files.internal("textures/menuAtlas.tpack"));
-
+        atlasArrow = new TextureAtlas((Gdx.files.internal("textures/arrow/arrows.pack")));
         font = new Font("font/font.fnt", "font/font.png");
         font.setSize(FONT_SIZE);
         sbAllRounds = new StringBuilder();
@@ -98,9 +99,9 @@ public class MenuScreen extends BaseScreen {
             for (int i = 0; i < STAR_COUNT; i++) {
                 stars[i] = new Star(atlas);
             }
-            buttonExit = new ButtonExit(atlas);
+            buttonExit = new ButtonExit(atlasArrow);
             buttonPlay = new ButtonPlay(atlas, game);
-            buttonGym = new ButtonGym(atlas, game);
+            buttonGym = new ButtonGym(atlasArrow, game);
 
         } catch (GameException e) {
             throw new RuntimeException(e);

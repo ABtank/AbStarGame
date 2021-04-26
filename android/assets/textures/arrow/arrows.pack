@@ -1,0 +1,82 @@
+arrows.png
+size: 941, 291
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+black_arrow
+  rotate: false
+  xy: 136, 0
+  size: 69, 56
+  orig: 69, 56
+  offset: 0, 0
+  index: -1
+blue_arrow
+  rotate: false
+  xy: 0, 0
+  size: 68, 55
+  orig: 68, 55
+  offset: 0, 0
+  index: -1
+blue_btn
+  rotate: false
+  xy: 473, 0
+  size: 200, 52
+  orig: 200, 52
+  offset: 0, 0
+  index: -1
+green_arrow
+  rotate: false
+  xy: 205, 0
+  size: 69, 56
+  orig: 69, 56
+  offset: 0, 0
+  index: -1
+green_btn
+  rotate: false
+  xy: 673, 0
+  size: 200, 53
+  orig: 200, 53
+  offset: 0, 0
+  index: -1
+pause
+  rotate: false
+  xy: 469, 56
+  size: 236, 235
+  orig: 236, 235
+  offset: 0, 0
+  index: -1
+play
+  rotate: false
+  xy: 234, 56
+  size: 235, 235
+  orig: 235, 235
+  offset: 0, 0
+  index: -1
+red_arrow
+  rotate: false
+  xy: 68, 0
+  size: 68, 56
+  orig: 68, 56
+  offset: 0, 0
+  index: -1
+red_btn
+  rotate: false
+  xy: 274, 0
+  size: 199, 52
+  orig: 199, 52
+  offset: 0, 0
+  index: -1
+rollback
+  rotate: false
+  xy: 705, 56
+  size: 236, 235
+  orig: 236, 235
+  offset: 0, 0
+  index: -1
+stop
+  rotate: false
+  xy: 0, 56
+  size: 234, 235
+  orig: 234, 235
+  offset: 0, 0
+  index: -1

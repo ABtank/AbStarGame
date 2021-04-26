@@ -12,7 +12,7 @@ public class ButtonGym extends ScaleButton {
     private final Game game;
 
     public ButtonGym(TextureAtlas atlas, Game game) throws GameException {
-        super(atlas.findRegion("btPlay"));
+        super(atlas.findRegion("play"));
         this.game = game;
     }
 

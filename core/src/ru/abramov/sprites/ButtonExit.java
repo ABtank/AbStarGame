@@ -11,7 +11,7 @@ public class ButtonExit extends ScaleButton {
 
 
     public ButtonExit(TextureAtlas atlas) throws GameException {
-        super(atlas.findRegion("btExit"));
+        super(atlas.findRegion("stop"));
     }
 
     public void resize(Rect worldBounds) {

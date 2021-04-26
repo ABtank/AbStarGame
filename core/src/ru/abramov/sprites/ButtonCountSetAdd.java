@@ -11,14 +11,13 @@ public class ButtonCountSetAdd extends ScaleButton {
     MenuGym menuGym;
 
     public ButtonCountSetAdd(TextureAtlas atlas, MenuGym menuGym) throws GameException {
-        super(atlas.findRegion("right"));
-        angle = 180;
+        super(atlas.findRegion("black_arrow"));
         this.menuGym = menuGym;
     }
 
     public void resize(Rect worldBounds) {
         setHeightProportion(0.1f);
-        setRight(worldBounds.pos.x + 0.2f);
+        setRight(worldBounds.pos.x + 0.21f);
         setBottom(worldBounds.pos.y - 0.06f);
     }
 

@@ -11,7 +11,8 @@ public class ButtonCountExerciseSub extends ScaleButton {
 MenuGym menuGym;
 
     public ButtonCountExerciseSub(TextureAtlas atlas, MenuGym menuGym) throws GameException {
-        super(atlas.findRegion("left"));
+        super(atlas.findRegion("black_arrow"));
+        angle = 180;
         this.menuGym = menuGym;
     }
 
